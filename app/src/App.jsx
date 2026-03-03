@@ -148,7 +148,7 @@ function S01({ go }) {
 }
 
 // ── S02 WHY CHOOSE US ──────────────────────────────────────────────────────
-function S02({ go }) {
+function S02({ go, back }) {
     const vals = [
         { bg: "rgba(200,75,12,.11)", ic: C.clay, title: "AI Voice Matching", sub: "Just speak — AI finds your best scheme instantly" },
         { bg: "rgba(76,201,160,.09)", ic: C.teal, title: "200+ Verified Schemes", sub: "Government & private, all RBI verified" },
@@ -191,7 +191,7 @@ function S02({ go }) {
 }
 
 // ── S03 LANGUAGE ───────────────────────────────────────────────────────────
-function S03({ go }) {
+function S03({ go, back }) {
     const [sel, setSel] = useState(0);
     const langs = [
         { flag: "🇮🇳", name: "हिंदी", nat: "Hindi" }, { flag: "🇬🇧", name: "English", nat: "English" },
@@ -230,7 +230,7 @@ function S03({ go }) {
 }
 
 // ── S04 OTP ────────────────────────────────────────────────────────────────
-function S04({ go }) {
+function S04({ go, back }) {
     const [cnt, setCnt] = useState(28);
     useEffect(() => { const i = setInterval(() => setCnt(c => c > 0 ? c - 1 : 0), 1000); return () => clearInterval(i); }, []);
     const otp = ["9", "4", "2", ""];
@@ -400,12 +400,15 @@ function HomeNew({ go }) {
 }
 
 // ── S06 VOICE WELCOME ──────────────────────────────────────────────────────
-function S06({ go }) {
+function S06({ go, back }) {
     const bars = [11, 21, 28, 20, 30, 17, 24, 13];
     return (
         <div className="sc" style={{ height: "100%", background: "#0E1210", display: "flex", flexDirection: "column", alignItems: "center", position: "relative", overflow: "hidden" }}>
             <div style={{ position: "absolute", top: "38%", left: "50%", transform: "translate(-50%,-50%)", width: px(280), height: px(280), background: "radial-gradient(circle 140px at center,rgba(76,201,160,.08),transparent)", borderRadius: "50%", pointerEvents: "none" }} />
             <SB />
+            <div style={{ padding: "0 16px 8px", display: "flex", alignItems: "center" }}>
+                <button onClick={back} style={{ width: px(26), height: px(26), borderRadius: "50%", background: C.card1, border: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "center" }}>{I.back(C.textMuted, 13)}</button>
+            </div>
             <div style={{ textAlign: "center", marginTop: px(6) }}>
                 <div style={{ fontFamily: F.mono, fontSize: px(9), color: C.teal, letterSpacing: "1.5px" }}>AI ADVISOR ACTIVE</div>
                 <div style={{ fontFamily: F.serif, fontWeight: 600, fontSize: px(20), color: C.textPrimary, marginTop: px(4) }}>नमस्ते, Rahul!</div>
@@ -644,7 +647,7 @@ function SpecialistConfirm({ go, back, data, setSelectedSlot }) {
 }
 
 // ── SPECIALIST BOOKED (NEW S08b) ───────────────────────────────────────────
-function SpecialistBooked({ go, selectedSlot }) {
+function SpecialistBooked({ go, back, selectedSlot }) {
     return (
         <div className="sc" style={{ height: "100%", background: "#08100D", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", position: "relative" }}>
             <SB />
@@ -757,7 +760,7 @@ function S09({ go, back }) {
 }
 
 // ── S10 CALL BOOKED ────────────────────────────────────────────────────────
-function S10({ go }) {
+function S10({ go, back }) {
     useEffect(() => { const t = setTimeout(() => go("home_new"), 3500); return () => clearTimeout(t); }, []);
     return (
         <div className="sc" style={{ height: "100%", background: "#0B100D", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", position: "relative" }}>
@@ -1089,7 +1092,7 @@ function Payment({ go, back }) {
 }
 
 // ── PAYMENT SUCCESS ────────────────────────────────────────────────────────
-function PaySuccess({ go }) {
+function PaySuccess({ go, back }) {
     return (
         <div className="sc" style={{ height: "100%", background: "#0B100D", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", position: "relative" }}>
             <SB />
@@ -1628,20 +1631,20 @@ export default function App() {
     const renderScr = () => {
         switch (scr) {
             case "s01": return <S01 go={go} />;
-            case "s02": return <S02 go={go} />;
-            case "s03": return <S03 go={go} />;
-            case "s04": return <S04 go={go} />;
+            case "s02": return <S02 go={go} back={back} />;
+            case "s03": return <S03 go={go} back={back} />;
+            case "s04": return <S04 go={go} back={back} />;
             case "home_new": return <HomeNew go={go} />;
             case "schemes_browse": return <SchemesBrowser go={go} back={back} setSchemeData={setSchemeData} inMainApp={false} />;
             case "scheme_detail": return <SchemeDetail go={go} back={back} data={schemeData} showSpec={!hasPurchase} />;
             case "s06": return <S06 go={go} back={back} />;
             case "s07": return <S07 go={go} back={back} setSchemeData={setSchemeData} isOverlay={false} />;
             case "specialist_confirm": return <SpecialistConfirm go={go} back={back} data={schemeData} setSelectedSlot={setSelectedSlot} />;
-            case "specialist_booked": return <SpecialistBooked go={go} selectedSlot={selectedSlot} />;
+            case "specialist_booked": return <SpecialistBooked go={go} back={back} selectedSlot={selectedSlot} />;
             case "s09": return <S09 go={go} back={back} />;
-            case "s10": return <S10 go={go} />;
+            case "s10": return <S10 go={go} back={back} />;
             case "payment": return <Payment go={go} back={back} />;
-            case "pay_success": return <PaySuccess go={(s) => { setHasPurchase(true); setNavTab("home"); setScr(s); setHist([]); }} />;
+            case "pay_success": return <PaySuccess go={(s) => { setHasPurchase(true); setNavTab("home"); setScr(s); setHist([]); }} back={back} />;
             case "main_home": return <S11 go={go} hasPurchase={hasPurchase} />;
             case "myapp": return <S13 setActiveD={setActiveD} setSheet={setCameraOpen} />;
             case "chat": return <S14 />;
