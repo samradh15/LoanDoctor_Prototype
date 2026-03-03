@@ -407,7 +407,7 @@ function S06({ go, back }) {
             <div style={{ position: "absolute", top: "38%", left: "50%", transform: "translate(-50%,-50%)", width: px(280), height: px(280), background: "radial-gradient(circle 140px at center,rgba(76,201,160,.08),transparent)", borderRadius: "50%", pointerEvents: "none" }} />
             <SB />
             <div style={{ padding: "0 16px 8px", display: "flex", alignItems: "center" }}>
-                <button onClick={back} style={{ width: px(26), height: px(26), borderRadius: "50%", background: C.card1, border: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "center" }}>{I.back(C.textMuted, 13)}</button>
+                <button onClick={back} style={{ display: "flex", alignItems: "center", gap: px(5), background: C.card1, border: `1px solid ${C.border}`, borderRadius: px(10), padding: "6px 12px 6px 8px", color: C.textPrimary }}>{I.back(C.textPrimary, 15)}<span style={{ fontFamily: F.sans, fontSize: px(13), fontWeight: 600 }}>Back</span></button>
             </div>
             <div style={{ textAlign: "center", marginTop: px(6) }}>
                 <div style={{ fontFamily: F.mono, fontSize: px(9), color: C.teal, letterSpacing: "1.5px" }}>AI ADVISOR ACTIVE</div>
@@ -583,7 +583,7 @@ function SpecialistConfirm({ go, back, data, setSelectedSlot }) {
         <div className="sc" style={{ height: "100%", background: C.bg, display: "flex", flexDirection: "column" }}>
             <SB />
             <div style={{ padding: "0 16px 14px", display: "flex", alignItems: "center", gap: px(10), borderBottom: `1px solid ${C.border}` }}>
-                <button onClick={back} style={{ width: px(26), height: px(26), borderRadius: "50%", background: C.card1, border: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "center" }}>{I.back(C.textMuted, 13)}</button>
+                <button onClick={back} style={{ display: "flex", alignItems: "center", gap: px(5), background: C.card1, border: `1px solid ${C.border}`, borderRadius: px(10), padding: "6px 12px 6px 8px", color: C.textPrimary }}>{I.back(C.textPrimary, 15)}<span style={{ fontFamily: F.sans, fontSize: px(13), fontWeight: 600 }}>Back</span></button>
             </div>
             <div style={{ flex: 1, overflowY: "auto", padding: "16px 16px 40px", display: "flex", flexDirection: "column" }}>
 
@@ -701,7 +701,7 @@ function S09({ go, back }) {
         <div className="sc" style={{ height: "100%", background: C.bg, display: "flex", flexDirection: "column" }}>
             <SB />
             <div style={{ padding: "0 16px 10px", display: "flex", alignItems: "center", gap: px(10), borderBottom: `1px solid ${C.border}` }}>
-                <button onClick={back} style={{ width: px(26), height: px(26), borderRadius: "50%", background: C.card1, border: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "center" }}>{I.back(C.textMuted, 13)}</button>
+                <button onClick={back} style={{ display: "flex", alignItems: "center", gap: px(5), background: C.card1, border: `1px solid ${C.border}`, borderRadius: px(10), padding: "6px 12px 6px 8px", color: C.textPrimary }}>{I.back(C.textPrimary, 15)}<span style={{ fontFamily: F.sans, fontSize: px(13), fontWeight: 600 }}>Back</span></button>
                 <div>
                     <div style={{ fontFamily: F.serif, fontWeight: 700, fontSize: px(16), color: C.textPrimary }}>Request Call</div>
                     <div style={{ fontFamily: F.sans, fontSize: px(10), color: C.textMuted }}>Free Expert Consultation</div>
@@ -851,7 +851,7 @@ function SchemesBrowser({ go, back, setSchemeData, inMainApp }) {
             <div style={{ padding: `${inMainApp ? px(16) : 0} 16px 12px`, borderBottom: `1px solid ${C.border}` }}>
                 {!inMainApp && (
                     <div style={{ display: "flex", alignItems: "center", gap: px(10), marginBottom: px(16) }}>
-                        <button onClick={back} style={{ width: px(26), height: px(26), borderRadius: "50%", background: C.card1, border: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "center" }}>{I.back(C.textMuted, 13)}</button>
+                        <button onClick={back} style={{ display: "flex", alignItems: "center", gap: px(5), background: C.card1, border: `1px solid ${C.border}`, borderRadius: px(10), padding: "6px 12px 6px 8px", color: C.textPrimary }}>{I.back(C.textPrimary, 15)}<span style={{ fontFamily: F.sans, fontSize: px(13), fontWeight: 600 }}>Back</span></button>
                         <div style={{ fontFamily: F.serif, fontWeight: 700, fontSize: px(16), color: C.textPrimary }}>Browse Schemes</div>
                     </div>
                 )}
@@ -918,7 +918,7 @@ function SchemeDetail({ go, back, data, showSpec }) {
         <div className="sc" style={{ height: "100%", background: C.bg, display: "flex", flexDirection: "column", zIndex: 100 }}>
             {showSpec && <SB />}
             <div style={{ padding: `${showSpec ? 0 : px(16)} 16px 14px`, display: "flex", alignItems: "center", gap: px(10), borderBottom: `1px solid ${C.border}` }}>
-                <button onClick={back} style={{ width: px(26), height: px(26), borderRadius: "50%", background: C.card1, border: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "center" }}>{I.back(C.textMuted, 13)}</button>
+                <button onClick={back} style={{ display: "flex", alignItems: "center", gap: px(5), background: C.card1, border: `1px solid ${C.border}`, borderRadius: px(10), padding: "6px 12px 6px 8px", color: C.textPrimary }}>{I.back(C.textPrimary, 15)}<span style={{ fontFamily: F.sans, fontSize: px(13), fontWeight: 600 }}>Back</span></button>
                 <div style={{ fontFamily: F.serif, fontWeight: 700, fontSize: px(16), color: C.textPrimary }}>Scheme Details</div>
             </div>
 
@@ -1020,7 +1020,7 @@ function Payment({ go, back }) {
         <div className="sc" style={{ height: "100%", background: C.bg, display: "flex", flexDirection: "column" }}>
             <SB />
             <div style={{ padding: "0 16px 14px", display: "flex", alignItems: "center", gap: px(10), borderBottom: `1px solid ${C.border}` }}>
-                <button onClick={back} style={{ width: px(26), height: px(26), borderRadius: "50%", background: C.card1, border: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "center" }}>{I.back(C.textMuted, 13)}</button>
+                <button onClick={back} style={{ display: "flex", alignItems: "center", gap: px(5), background: C.card1, border: `1px solid ${C.border}`, borderRadius: px(10), padding: "6px 12px 6px 8px", color: C.textPrimary }}>{I.back(C.textPrimary, 15)}<span style={{ fontFamily: F.sans, fontSize: px(13), fontWeight: 600 }}>Back</span></button>
                 <div>
                     <div style={{ fontFamily: F.serif, fontWeight: 700, fontSize: px(16), color: C.textPrimary }}>Choose Your Plan</div>
                     <div style={{ fontFamily: F.sans, fontSize: px(10), color: C.textMuted }}>Secure your application process</div>
