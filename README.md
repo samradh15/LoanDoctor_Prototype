@@ -1,500 +1,967 @@
-
-# LOAN DOCTOR — MASTER PROTOTYPE PROMPT
-### For Antigravity · Mobile App · Final Client Presentation Grade
-
-Build a complete, high-fidelity, fully interactive mobile app prototype for **Loan Doctor** — an AI-powered, voice-first, vernacular loan advisory platform for Indian users. This is final client-presentation grade. Every screen, every interaction, every micro-detail must feel like a real shipped product. Think Airbnb, Groww, or Zepto quality. Not a wireframe. Not a concept. A real app.
-
----
-
-## DESIGN SYSTEM — APPLY GLOBALLY
-
-**Colors:**
-- App background: `#111510` (deep warm near-black, green undertone)
-- Card surface 1: `#1C2118`
-- Card surface 2: `#242B20` (inputs, nested cards)
-- Primary accent: `#C84B0C` (burnt saffron — CTAs, active nav, brand moments)
-- Teal accent: `#4CC9A0` (success, AI active, uploaded, confirmed states)
-- Amber: `#F5A623` (in-progress, warnings)
-- Text primary: `#EDF0E8` (warm near-white)
-- Text muted: `#7A8072`
-- All card borders: `rgba(237,240,232,0.07)` — every card has a border, never borderless
-- CTA button shadow: `0 4px 18px rgba(200,75,12,0.32)`
-
-**Typography:**
-- Headings/display: `Fraunces` serif, weight 700–900
-- Body/UI: `Plus Jakarta Sans`, weight 400/500/600
-- Metadata/chips/codes: `Syne Mono`
-- Never use: Inter, Roboto, SF Pro, system fonts
-
-**Spacing:** Base 4px. Card padding 14–16px. Screen sides 16px. CTA height 50px. Input height 48px.
-
-**Radius:** Cards 14px main, 10px nested, buttons 13px, chips 5px (not pill), avatar circles 50%
-
-**Transitions:** Screen nav = slide left. Back = slide right. Tab switch = crossfade. Bottom sheets = spring `cubic-bezier(0.16,1,0.3,1)`. Press = scale 0.97.
-
-**Status bar:** Dynamic island placeholder. Syne Mono time. `rgba(237,240,232,0.45)` color.
-
----
-
-## APP ARCHITECTURE
-
-```
-ONBOARDING (no bottom nav):
-01 Splash → 02 Why Choose Us → 03 Select Language → 04 OTP Login
-
-VOICE FLOW (no bottom nav):
-05 Voice AI Welcome → 06 Voice + Live Chat Transcript
-
-RECOMMENDATION FLOW (no bottom nav):
-07 Top 3 AI Schemes → 08 Scheme Detail + Video
-
-PAYMENT FLOW (no bottom nav):
-09 Payment ₹1,999 → 10 Payment Success
-
-MAIN APP (bottom nav always visible, 5 tabs):
-11 Home · 12 Schemes · 13 Documentation · 14 Chat · 15 Profile
-```
-
----
-
-## SCREEN 01 — SPLASH
-
-Full `#111510`. Content at 46% height. Radial glow behind logo: `radial-gradient(circle 180px at center, rgba(200,75,12,0.07), transparent)`.
-
-Logo block (centered):
-- Icon container 72×72px, `border-radius: 20px`, `#1E2419`, border `1px solid rgba(200,75,12,0.22)`, medical cross SVG `#C84B0C` inside
-- `"Loan Doctor"` — Fraunces 700, 27px, `#EDF0E8`, letter-spacing -0.4px
-- `"YOUR LOAN. OUR PRESCRIPTION."` — Syne Mono 10px, `rgba(237,240,232,0.32)`, letter-spacing 2.5px
-
-Bottom dots (4, centered, 56px from bottom): active = `#C84B0C` 16px wide × 5px tall radius 3px. Inactive = `rgba(237,240,232,0.16)` 5×5px.
-
-Animation: fade+slide-up 600ms. Auto-transition after 2.5s → Screen 02.
-
----
-
-## SCREEN 02 — WHY CHOOSE US
-
-**Illustration zone** (195px, `#1C2118`):
-- Gradient: `linear-gradient(135deg, rgba(200,75,12,0.055), transparent 55%)`
-- Tag top-left: `"TRUSTED BY 50,000+ USERS"` Syne Mono 9px, muted border card
-- Center: Two concentric dashed circles (outer clay 0.25 opacity, inner teal 0.25 opacity) + cross SVG center `#C84B0C`
-
-**Content:**
-- Micro-label: `"WHY CHOOSE US"` Syne Mono 9px `#C84B0C` letter-spacing 2px
-- H1: `"India's Smartest Loan Advisory"` Fraunces 700, 19px
-
-**3 Value Cards** (gap 9px, bg `rgba(237,240,232,0.025)`, border, radius 10px, padding 10px 12px):
-- Layout: 28×28px icon container left + text right (title 600 12px / sub 400 10px `#7A8072`)
-- Card 1: Clay icon `rgba(200,75,12,0.11)` — **"AI Voice Matching"** / "Just speak — AI finds your best scheme instantly"
-- Card 2: Teal icon `rgba(76,201,160,0.09)` — **"200+ Verified Schemes"** / "Government & private, all RBI verified"
-- Card 3: Amber icon `rgba(245,166,35,0.09)` — **"6 Indian Languages"** / "Hindi, Tamil, Telugu, Marathi, Punjabi & more"
-
-**CTA:** `"Get Started →"` full-width, clay button → Screen 03
-
----
-
-## SCREEN 03 — SELECT LANGUAGE
-
-Header (54px top): step tag `"Step 1 of 2"` Syne Mono + 12px line before · H1 `"Select Language"` Fraunces 700 22px · sub Plus Jakarta Sans 11px `#7A8072`
-
-**6-tile grid** (2 cols, gap 7px, bg `#1C2118`, border 1.5px, radius 12px, padding 13px 11px):
-Each: flag container 26×26px + name (600 13px) + native script (400 10px `#7A8072`)
-Selected: border `1.5px solid #C84B0C`, bg `rgba(200,75,12,0.065)`, checkmark circle `#C84B0C` appears right
-
-Languages:
-1. 🇮🇳 हिंदी (pre-selected) · 2. 🇬🇧 English · 3. தமிழ் Tamil · 4. తెలుగు Telugu · 5. मराठी Marathi · 6. ਪੰਜਾਬੀ Punjabi
-
-CTA updates to: `"Continue in हिंदी →"` → Screen 04
-
----
-
-## SCREEN 04 — OTP LOGIN
-
-Brand strip (border-bottom): logo mark 32px + `"Loan Doctor"` Fraunces 700 16px
-
-Form (padding 22px 16px):
-- H2 `"Welcome back"` Fraunces 700 21px · sub Plus Jakarta Sans 11px `#7A8072`
-- Mobile field: label Syne Mono 9px `#7A8072` + input bg `#242B20` border radius 10px 48px height · phone icon + `"+91 98765 43210"` Plus Jakarta Sans 14px
-- OTP: label + 4 boxes (flex-1, 50px height, Syne Mono 700 19px). 3 filled (teal border + teal digit), 1 empty
-- Resend: `"OTP sent… Resend in 28s"` — resend in `#C84B0C`
-- CTA `"Verify & Continue →"` → Screen 05
-- Footer: `"New user? "` + `"Create account"` in `#4CC9A0`
-
----
-
-## SCREEN 05 — VOICE AI WELCOME
-
-Bg `#0E1210`. Ambient teal glow center.
-
-Top (52px, centered): `"AI ADVISOR ACTIVE"` Syne Mono 9px `#4CC9A0` · `"नमस्ते, Rahul!"` Fraunces 600 20px
-
-**AI Avatar + 3 Pulse Rings** (centered):
-- Rings: 90/114/138px, border `1px solid rgba(76,201,160,0.18/0.12/0.06)`, delays 0/0.4/0.8s
-- Animation: `scale(1.05) → scale(1)`, opacity 0.6→0.1, 2.4s infinite independent
-- Avatar: 68px circle, `#1C2A23`, teal border 1.5px, cross SVG `#4CC9A0`
-
-Speech bubble (radius `12px 12px 12px 3px`, bg `#1C2118`):
-- `"LOAN DOCTOR AI"` Syne Mono 8px `#4CC9A0`
-- `"नमस्ते Rahul! आप किस तरह का loan लेना चाहते हैं? Amount और purpose बताइए।"` Plus Jakarta Sans 12px `#EDF0E8`
-
-Sound bars (8 bars, 3px wide, `#4CC9A0`, heights 11/21/28/20/30/17/24/13px, scaleY pulse animation staggered 0.08s, 0.9s infinite)
-
-Status label: `"AI SPEAKING…"` Syne Mono 8px `#7A8072`
-
-Mic button: 50px `#C84B0C`, mic SVG, shadow `0 5px 22px rgba(200,75,12,0.4)`
-Hint below: `"Tap to respond"` Syne Mono 8px `#7A8072`
-
----
-
-## SCREEN 06 — LIVE VOICE + CHAT TRANSCRIPT
-
-Header: AI avatar 30px + `"Loan Doctor AI"` / `"● Live Consultation"` `#4CC9A0`
-
-Recording pill (bg `rgba(76,201,160,0.065)`, border teal, radius 20px): mini 4-bar animation + `"Voice recording — transcribed live"`
-
-Chat area (AI bubbles left radius `3px 12px 12px 12px` bg `#242B20` · User bubbles right radius `12px 12px 3px 12px` bg `rgba(200,75,12,0.10)` · System italic teal):
-
-Messages:
-1. AI: `"Business कितने साल पुराना है, और monthly turnover?"`
-2. User: `"3 साल का कपड़े का business। Monthly 40,000 कमाता हूँ।"`
-3. AI: `"Aadhaar, PAN, 6 months bank statement available है?"`
-4. User: `"हाँ, सब available है।"`
-5. System italic teal: `"Analysing profile · Matching top schemes…"` + 3-dot loading
-
-Bottom: text field `#1C2118` radius 20px + mic button 32px `#C84B0C`
-
----
-
-## SCREEN 07 — TOP 3 RECOMMENDATIONS
-
-Header: blinking-dot badge `"AI MATCHED · 3 SCHEMES"` teal · H1 `"Best Schemes for Your Profile"` Fraunces 700 18px · sub `#7A8072`
-
-**Card 1 — BEST MATCH:**
-Border `rgba(200,75,12,0.32)`, bg `rgba(200,75,12,0.035)`, radius 14px
-Top ribbon tag: pos absolute top-1px right-12px, bg `#C84B0C`, `"BEST MATCH"` Syne Mono 7px white, radius `0 0 5px 5px`
-Icon 30px (clay SVG) + `"MUDRA Tarun Loan"` / `"Pradhan Mantri Mudra Yojana"`
-Description: "Collateral-free for established businesses. Quick disbursal, flexible tenure."
-Chips: `"Up to ₹10L"` clay · `"8.5% p.a."` teal · `"5–7 Days"` gray
-
-**Card 2:** `"CGTMSE Scheme"` · Up to ₹5L · 9.2% p.a.
-**Card 3:** `"PM SVANidhi"` · Up to ₹5L · 7% p.a.
-
-Tap any card → Screen 08
-
----
-
-## SCREEN 08 — SCHEME DETAIL + VIDEO
-
-Nav: back circle 26px + scheme name
-
-Video thumbnail (margin 10px 13px, radius 12px, 118px height, dark gradient + subtle red tint):
-- Play button: 40px white circle, play triangle inside
-- Caption strip: red dot + `"How MUDRA Tarun Loan Works — Loan Doctor"` 9px
-
-4-stat grid (2×2, bg `#1C2118`, border, radius 10px):
-1. LOAN AMOUNT / `"₹10L"` `#C84B0C`
-2. INTEREST RATE / `"8.5%"` `#4CC9A0`
-3. PROCESSING / `"5–7 Days"` `#4CC9A0`
-4. COLLATERAL / `"None"` `#4CC9A0`
-
-Suggested Reply:
-- `"✓ Confirm Plan"` (teal outline, teal text) → Screen 09
-- `"Not Interested"` (muted) → back to 07
-
----
-
-## SCREEN 09 — PAYMENT
-
-Header: `"Confirm Plan"` Fraunces 700 22px + sub
-
-Amount card (bg `#1C2118`, border, radius 15px, padding 19px):
-- `"TOKEN AMOUNT"` Syne Mono 9px `#7A8072` / `"MUDRA Tarun Loan"` `#4CC9A0`
-- `"₹1,999"` Fraunces 900, 42px (₹ as superscript)
-- Divider
-- Two teal-check inclusion rows: "Dedicated agent assigned" + "Full scheme processing"
-
-3-tile payment grid: 📱 GPay/UPI (selected = clay border) · 💳 Card · 🏦 Net Banking
-
-CTA: `"Pay ₹1,999 Securely"` (lock icon SVG left) → loading → Screen 10
-Security: lock SVG + `"256-bit SSL · Razorpay"` Syne Mono 9px `#7A8072`
-
----
-
-## SCREEN 10 — PAYMENT SUCCESS
-
-Bg `#0B100D`, ambient teal glow.
-Pulsing ping ring → check circle 76px teal (draws in animated) → `"Payment Confirmed"` Fraunces 700 21px → sub centered.
-
-2 confirmation cards:
-1. WhatsApp — checkmark teal icon — `"Invoice on WhatsApp"` / `"Sent to +91 98765 43210"`
-2. Agent — person `#C84B0C` icon — `"Agent Assigned"` / `"Ramesh K. will call within 2 hours"`
-
-CTA: `"Open Loan Doctor App →"` → Screen 11 (main app)
-
----
-
-## BOTTOM NAV — GLOBAL SPEC
-
-Fixed bottom, 62px, bg `rgba(17,21,16,0.96)`, `backdrop-filter: blur(18px)`, border-top `rgba(237,240,232,0.07)`.
-
-5 tabs equal width:
-1. **Home** — house SVG
-2. **Schemes** — list SVG
-3. **Documentation** — folder/upload SVG
-4. **Chat** — message bubble SVG
-5. **Profile** — person circle SVG
-
-Each: icon container 34×26px radius 9px + Syne Mono 8px label `#7A8072`
-Active: icon bg `rgba(200,75,12,0.11)`, icon stroke `#C84B0C`, label `#C84B0C`. Pill scales in on switch (200ms spring).
-
----
-
-## SCREEN 11 — HOME
-
-Header (50px top, 14px sides):
-- `"Good morning ☀️"` Plus Jakarta Sans 10px `#7A8072` / `"Rahul Kumar"` Fraunces 700 20px
-- Bell icon 32px (bg `#1C2118`) with notification dot 7px `#C84B0C` (tiny pulse animation)
-
-**Active Loan Card** (margin 0 13px, bg `#1C2118`, border, radius 15px, padding 16px):
-- Decorative radial glow top-right `rgba(200,75,12,0.07)`
-- `"ACTIVE APPLICATION"` Syne Mono 9px `#7A8072` / `"IN REVIEW"` badge (amber: bg `rgba(245,166,35,0.09)`, border `rgba(245,166,35,0.18)`, Syne Mono 8px `#F5A623`, radius 4px)
-- `"MUDRA Tarun Loan"` Fraunces 700 15px
-- Progress bar: 3px, fill `linear-gradient(90deg, #C84B0C, #F5A623)` at 35% — **animates from 0 on load**
-- `"Applied"` left / `"35% Complete"` right — Plus Jakarta Sans 9px `#7A8072`
-
-**Progress Timeline** (inside `#1C2118` card, padding 14px 16px, radius 12px, margin 12px 13px — this is critical design):
-4 steps horizontal: `"Applied"` → `"Docs"` → `"Review"` → `"Approved"`
-- Each step: 18px circle above connecting line + Syne Mono 8px label below
-- Completed (1+2): circle filled `#C84B0C`, white checkmark inside, connecting line `#C84B0C`
-- Current (3 "Review"): circle outlined `#C84B0C`, inner pulsing dot `#C84B0C`, label `#C84B0C`
-- Future (4): circle `rgba(237,240,232,0.15)`, connecting line `rgba(237,240,232,0.15)`, label `#7A8072`
-- Gradient line between step 2→3: clay → transparent
-
-**Recent Updates** (margin-top 18px):
-Title row: `"Recent Updates"` 600 12px `#EDF0E8` / `"View all"` 10px `#C84B0C` (padding 0 13px)
-2 cards (padding 0 13px, gap 7px, bg `#1C2118`, border, radius 11px, padding 11px 13px):
-- Icon 32px circle + title/sub + timestamp Syne Mono 9px far right
-1. Agent icon → `"Ramesh K. called"` / `"Confirmed document list sent"` · 2h ago
-2. Doc icon → `"Bank Statement needed"` / `"Upload in Documentation tab"` · 4h ago — **border `rgba(200,75,12,0.18)` action-required cue**
-
-**Explore Schemes** (horizontal scroll, min-width 94px cards): MUDRA Tarun 8.5% · CGTMSE 9.2% · Kisan Credit 4%
-
-**Floating AI Mic FAB** (position absolute, bottom 72px, right 13px):
-- 48px circle `#C84B0C`, mic SVG white
-- Shadow: `0 5px 22px rgba(200,75,12,0.48), 0 0 0 5px rgba(200,75,12,0.09)`
-- Second outer ring pulses constantly at 0.8x opacity
-- Tooltip beside it: `"Consult AI anytime"` — bg `#1C2118`, border, radius 8px, arrow pointing to FAB
-- Tap → Screen 06 as full-screen modal overlay
-
----
-
-## SCREEN 12 — SCHEMES
-
-Header: `"Schemes"` Fraunces 700 22px
-
-Search bar: bg `#1C2118`, radius 12px, search SVG + placeholder Plus Jakarta Sans 12px `#7A8072`
-
-**Location + Filter Row:**
-- Location pill: bg `rgba(200,75,12,0.065)`, border `rgba(200,75,12,0.18)`, radius 20px — pin SVG `#C84B0C` + `"Tamil Nadu, Chennai"` Plus Jakarta Sans 500 11px `#C84B0C` + chevron-down — tap → location bottom sheet
-- Filter button: bg `#1C2118`, border, radius 8px — filter SVG + `"Filter"` `#7A8072`
-
-**Location Required Banner** (State tab only, no location set):
-bg `rgba(245,166,35,0.065)`, border amber, radius 10px — warning icon + `"Your location is needed to show state-specific schemes"` — tap → location sheet
-
-**Central/State Toggle:**
-Container bg `#1C2118`, radius 10px, padding 3px. Two equal pills.
-Active: bg `#C84B0C`, Plus Jakarta Sans 600 12px white, radius 8px. Inactive: transparent `#7A8072`.
-**Toggle pill slides horizontally** — not just color change.
-
-**Central Schemes** (default):
-Sub-label: `"Applicable across all of India"` Plus Jakarta Sans 10px `#7A8072`
-5 cards (bg `#1C2118`, border, radius 13px, padding 13px):
-Each: icon 30px + name/ministry + `"Eligible"` teal badge right + description 2 lines + chips row
-
-1. MUDRA Shishu — Up to ₹50K · Low interest · Micro-enterprise
-2. MUDRA Kishore — Up to ₹5L · 8.2% p.a. · Growing business
-3. MUDRA Tarun — **highlight: active application** — Up to ₹10L · 8.5% p.a.
-4. CGTMSE — Up to ₹5L · 9.2% p.a. · No collateral
-5. PM SVANidhi — Up to ₹5L · 7% p.a. · Small traders
-
-**State Schemes** (after location set — Tamil Nadu):
-Header: `"State Schemes — Tamil Nadu"` Fraunces 600 16px
-4 schemes: TNSCB Loan · NABARD Rural · MSME Tamil Nadu · Kalaignar Startup Scheme
-
-**Location Bottom Sheet** (380px, top radius 24px, handle bar):
-- `"Select Location"` Fraunces 700 18px
-- State dropdown (styled, bg `#242B20`) + City dropdown
-- `"Use Current Location"` teal outline button with GPS icon
-- `"Confirm Location"` clay CTA
-
----
-
-## SCREEN 13 — DOCUMENTATION
-
-Header (50px top, 13px sides, border-bottom):
-- `"Documentation"` Fraunces 700 20px / `"MUDRA TARUN"` scheme badge `#C84B0C` Syne Mono 9px
-- Progress: track (flex-1, 3px, fill 40% clay→amber) + `"2 / 5 uploaded"` Syne Mono 9px — **animates on load**
-
-Section label: `"REQUIRED DOCUMENTS"` Syne Mono 9px `#7A8072` letter-spacing 1.5px
-
-**Document Cards:**
-
-**Uploaded state** (Aadhaar, PAN):
-Border `1.5px solid rgba(76,201,160,0.22)`, radius 12px
-Row: icon 30px bg `rgba(76,201,160,0.09)` document SVG `#4CC9A0` + name/filename + `"✓ DONE"` Syne Mono 8px `#4CC9A0`
-
-**Required not-uploaded** (Bank Statement, Business Proof):
-Border `1.5px solid rgba(200,75,12,0.18)`, radius 12px
-Row: icon 30px bg `rgba(200,75,12,0.07)` dashed-doc SVG `#C84B0C` + name/sub + `"Upload"` button (clay outline, Plus Jakarta Sans 600 9px `#C84B0C`)
-Note strip inside card: info SVG + helper text
-- Bank Statement note: `"All 6 months must be from same bank account"`
-
-Documents (MUDRA Tarun scheme):
-1. ✅ Aadhaar Card (aadhaar.pdf · 482 KB)
-2. ✅ PAN Card (pan.jpg · 218 KB)
-3. ⬆ Bank Statement — Last 6 months — REQUIRED
-4. ⬆ Business Proof (GST / Udyam / Registration) — REQUIRED
-
-Section label: `"OPTIONAL — Speeds Up Approval"` Syne Mono 9px `#7A8072`
-5. ITR / Form 16 — `"Add"` (gray outline button)
-
-**Upload interaction:** Tap `"Upload"` → bottom sheet (2 options: 📷 Camera / 📁 Browse Files) → after pick: card border transitions clay→teal (300ms), checkmark appears, status becomes `"✓ DONE"`
-
-Info notice (before submit): `"All documents are end-to-end encrypted and shared only with lenders"` Plus Jakarta Sans 10px `#7A8072`, inside bordered card
-
-**Submit button:**
-- Disabled state (gray, 40% opacity) when required docs missing
-- Active state (clay) when all required docs uploaded — transitions between states
-- `"Submit Documents"` with upload arrow SVG
-
----
-
-## SCREEN 14 — CHAT
-
-Header (50px top, 13px sides, border-bottom):
-Agent row: avatar 32px (bg `#242B20`, border `rgba(200,75,12,0.22)`, person SVG `#C84B0C`) with online dot (7px `#4CC9A0`, border `1.5px solid #111510`) + `"Ramesh K."` / `"Loan Advisor · MUDRA Tarun"` + call + video icon buttons right
-
-Case strip (bg `rgba(200,75,12,0.055)`, border `rgba(200,75,12,0.14)`, radius 7px):
-`"Case Reference"` `#7A8072` / `"LD-2024-038"` Syne Mono `#C84B0C`
-
-Chat messages:
-- AI/Agent left: bg `#242B20`, radius `3px 12px 12px 12px`
-- User right: bg `rgba(200,75,12,0.10)`, radius `12px 12px 3px 12px`
-- Success/milestone: bg `rgba(76,201,160,0.07)`, border teal
-- All timestamps: Syne Mono 9px `#7A8072`
-
-Conversation:
-1. [Success] `"✓ Payment confirmed. Case registered as LD-2024-038. Welcome!"` — 10:00
-2. [Agent] `"Please upload Bank Statement (6 months) and Business Proof in Documentation tab."` — 10:05
-3. [User] `"Documents uploaded ✓"` — 10:12
-4. [Success] `"Received! Reviewing documents. Disbursal expected 5–7 working days."` — 10:14
-
-Bottom: text field radius 20px bg `#1C2118` + mic button 30px `#C84B0C`
-
----
-
-## SCREEN 15 — PROFILE
-
-Header: `"Profile"` Fraunces 700 22px
-
-User card (bg `#1C2118`, border, radius 16px, padding 18px):
-- Avatar 48px: bg `#242B20`, initials `"RK"` Fraunces 700 18px `#C84B0C`
-- `"Rahul Kumar"` Fraunces 700 16px / `"+91 98765 43210"` Plus Jakarta Sans 11px `#7A8072`
-- `"Edit"` pill right: border `rgba(237,240,232,0.07)`, text `#7A8072`, radius 20px
-
-Active application mini-card (scheme name + status + mini progress bar)
-
-Settings groups (each group label: Syne Mono 9px `#7A8072` letter-spacing 1.5px):
-Items: bg `#1C2118`, border, grouped with dividers, padding 13px 14px, flex space-between
-
-`"ACCOUNT"`: Language Preference (हिंदी, chevron) · Notifications (toggle ON, clay) · Linked Mobile (pencil icon)
-`"SUPPORT"`: Contact Agent (green call SVG) · Help & FAQ · Report an Issue
-`"LEGAL"`: Privacy Policy · Terms of Service
-
-Logout: border `rgba(237,240,232,0.12)`, bg transparent, text `rgba(237,240,232,0.5)`, Plus Jakarta Sans 600 13px, radius 12px, full width
-
----
-
-## COMPLETE INTERACTION MAP
-
-```
-01 (auto 2.5s) → 02
-02 "Get Started" → 03
-03 "Continue in हिंदी" → 04
-04 "Verify & Continue" → 05
-05 Mic tap → 06
-06 [AI analysis ends] → 07
-07 Scheme card tap → 08
-08 "Confirm Plan" → 09
-08 "Not Interested" → 07 (back)
-09 "Pay ₹1,999" → [loading] → 10
-10 "Open App" → 11 (main app)
-11 Nav: Schemes → 12
-11 Nav: Documentation → 13
-11 Nav: Chat → 14
-11 Nav: Profile → 15
-11 Mic FAB → 06 (modal overlay)
-12 Location pill → Location bottom sheet
-12 State toggle → State schemes view
-12 Scheme card → Scheme detail
-13 Upload button → File picker sheet → uploaded state
-14 Mic → Voice input mode
-All back buttons → previous screen
-All nav tabs → respective screens
-```
-
----
-
-## MICROINTERACTIONS — ALL REQUIRED
-
-- OTP box fill: scale 1.04 + teal border glow pulse
-- Language tile select: checkmark slides in from right (spring bounce)
-- Voice rings: each pulses independently (never in sync with others)
-- AI 3-dot loading: sequential scale up 0.15s staggered → all scale down together
-- Scheme card press: scale 0.97 → spring release
-- Bottom sheet: spring `cubic-bezier(0.16,1,0.3,1)`
-- Progress bars: animate 0 → target on screen load (800ms)
-- Timeline steps: checks animate in sequentially on Home load
-- FAB: constant outer ring pulse at 0.8x opacity
-- Chat messages: slide in from below 200ms
-- Payment success check: stroke draw animation → circle scales
-- Document uploaded: border clay→teal 300ms + check icon appears
-- Toggle: pill slides horizontally (not color-only)
-- Notification dot: tiny scale-pulse loop
-- Bottom nav active: pill background scales 0→1 (200ms)
-- Submit button: disabled gray → active clay transition when docs complete
-
----
-
-## 15 NON-NEGOTIABLE DESIGN RULES
-
-1. No gradients on text — solid colors only
-2. No purple/blue anywhere — palette is clay + teal + forest green only
-3. No neumorphism — clean flat cards with hairline borders
-4. No white backgrounds — always warm dark `#111510` tones
-5. Every single card has a `1px border rgba(237,240,232,0.07)` — borderless = cheap
-6. Asymmetric bubble radius (`3px` at tail) — not uniform radius on chat bubbles
-7. Fraunces for all headings — no sans-serif display text
-8. Syne Mono for all metadata/labels/chips — never Plus Jakarta Sans for functional tags
-9. Clay `#C84B0C` = unique identity — only CTA + active nav + brand moments
-10. Teal `#4CC9A0` = success/AI/confirmed ONLY — not decorative
-11. Amber `#F5A623` = in-progress/warning ONLY — semantic meaning maintained
-12. Real Hindi text in voice/chat screens — no Lorem Ipsum or placeholder equivalents
-13. Progress timelines animate — not static
-14. All CTAs have their specific box-shadow — never flat buttons
-15. Icon SVGs are custom line-based, stroke 1.2–1.5px, consistent across all screens
-
----
-
-## FINAL REQUIREMENT
-
-15 fully connected interactive screens. All interactions per the map above. All animations implemented. All 5 nav tabs functional. Location sheet on Schemes. Document upload flow complete. Voice rings animated. Progress timeline animated. Payment end-to-end. The prototype must be indistinguishable from a real shipped mobile app.
-
----
-
-This prompt covers every pixel, every interaction, every state, and every micro-animation. The design system is locked. The flow is complete. Paste this directly into Antigravity and it should give you a production-grade prototype on first run.
-
-Two things to double-check in Antigravity specifically:
-1. Make sure Fraunces font is loaded (it's a Google Font — should work)
-2. The voice ring animations and sound bar animations need to be set to `loop: true` in Antigravity's animation settings
-3. The location bottom sheet on Screen 12 — set it as a "sheet" component type, not a page, so it slides up over the Schemes screen
+Build a complete single-file React JSX mobile app prototype for 
+"Loan Doctor Fintech" — a role-based platform where one app serves 
+five different user types. The role selected at login determines 
+which interface opens. This is a production-grade, investor-ready 
+Antigravity prototype.
+
+Output ONE file: loan-doctor-platform.jsx
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DESIGN SYSTEM (same across ALL roles)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Colors:
+  bg:           #111510
+  card1:        #1C2118
+  card2:        #242B20
+  clay:         #C84B0C   ← primary action
+  teal:         #4CC9A0   ← success / AI / positive
+  amber:        #F5A623   ← warning / pending
+  red:          #E05252   ← rejection / alert
+  textPrimary:  #EDF0E8
+  textMuted:    #7A8072
+  border:       rgba(237,240,232,0.07)
+  borderMid:    rgba(237,240,232,0.12)
+
+Role accent colors (used in role badges and nav highlights):
+  Customer:       #C84B0C  (clay)
+  Sales Exec:     #4CC9A0  (teal)
+  Team Leader:    #F5A623  (amber)
+  Franchisee:     #A78BFA  (purple)
+  Administrator:  #60A5FA  (blue)
+
+Typography (Google Fonts):
+  Fraunces 400/600/700/900     → headings, numbers
+  Plus Jakarta Sans 400/500/600/700 → body, labels
+  Syne Mono                    → tags, badges, timestamps, mono data
+
+Rules:
+  Cards: 1px border rgba(237,240,232,0.07), radius 14px
+  Nested cards: radius 10px
+  CTAs: radius 13px, clay shadow 0 4px 20px rgba(200,75,12,0.35)
+  Chips/tags: radius 5px (NOT pill), Syne Mono
+  Input fields: height 48px, bg card2, border border, radius 10px
+  Section labels: Syne Mono, 9px, letterSpacing 1.5px, textMuted
+  Mobile frame: 375×812px, radius 46px, dark desktop bg #0A0A0A
+  Dynamic island: 116×32px black pill, top center, z-index 999
+
+CSS Animations required:
+  fadeUp     — screen entry 0.3s ease
+  slideUp    — bottom sheet cubic-bezier(.16,1,.3,1)
+  slideLeft  — screen push from right
+  rA/rB/rC   — voice ring pulses (2.4s, different delays)
+  sBar       — sound bar scaleY (0.9s staggered)
+  blink      — status dots 1.2s
+  spin       — loader 0.7s linear
+  strokeIn   — SVG checkmark draw
+  popIn      — scale from 0 cubic-bezier
+  msgIn      — chat message slide up 0.22s
+  dotP       — timeline dot pulse 1.2s
+  badgeP     — offer badge pulse 2s
+  fabP       — floating button ring pulse 2s
+  countUp    — number animation on dashboard mount
+  shimmer    — skeleton loading state
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ONBOARDING — SHARED (all roles)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+S01 — SPLASH
+  Centered Loan Doctor cross logo in rounded square (clay)
+  "YOUR LOAN. OUR PRESCRIPTION." Syne Mono, spaced
+  Clay radial glow background
+  Dot progress indicator (first dot wider, clay)
+  Auto-advance to S02 after 2.5s
+
+S02 — WHY CHOOSE US
+  Top illustration zone (200px): two dashed concentric circles,
+  cross icon centered, "TRUSTED BY 50,000+ USERS" badge
+  3 value prop cards:
+    AI Voice Matching (clay icon)
+    200+ Verified Schemes (teal icon)
+    6 Indian Languages (amber icon)
+  "Get Started" clay CTA → S03
+
+S03 — LANGUAGE SELECT
+  2-col grid, 6 tiles: हिंदी · English · Tamil · Telugu · Marathi · Punjabi
+  Selected: clay border + popIn checkmark badge
+  CTA label changes to selected language → S04
+
+S04 — ROLE SELECT ← PROTOTYPE ONLY, replaces OTP
+  Heading: "Select Your Role"
+  Subtext: "This is a prototype — pick a role to preview that experience"
+  
+  5 role cards in vertical list, each tappable:
+  
+  ┌─────────────────────────────────────────┐
+  │  👤  Customer                           │
+  │      "Apply for loans & track status"   │
+  │      Clay accent dot                    │
+  └─────────────────────────────────────────┘
+  ┌─────────────────────────────────────────┐
+  │  🤝  Sales Executive                    │
+  │      "Create leads & collect documents" │
+  │      Teal accent dot                    │
+  └─────────────────────────────────────────┘
+  ┌─────────────────────────────────────────┐
+  │  👥  Team Leader                        │
+  │      "Manage team & track performance"  │
+  │      Amber accent dot                   │
+  └─────────────────────────────────────────┘
+  ┌─────────────────────────────────────────┐
+  │  🏢  Franchisee                         │
+  │      "Oversee branch & revenue"         │
+  │      Purple accent dot                  │
+  └─────────────────────────────────────────┘
+  ┌─────────────────────────────────────────┐
+  │  ⚙️  Administrator                      │
+  │      "Full system control"              │
+  │      Blue accent dot                    │
+  └─────────────────────────────────────────┘
+  
+  Selected card: role accent color border + checkmark
+  "Enter as [Role Name]" clay CTA
+  → Routes to respective home based on selected role
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ROLE 1 — CUSTOMER APP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+After role select → S06 Voice Welcome (skip marketing page)
+Marketing page only accessible from call-booked screen.
+
+─────────────────────────────────
+S06 — Voice AI Welcome
+─────────────────────────────────
+Dark screen #0E1210, teal radial glow
+"AI ADVISOR ACTIVE" Syne Mono label
+3 pulsing rings (rA/rB/rC, different delays and opacities)
+Teal cross icon in 70px circle at center
+Hindi speech bubble from AI below rings
+8-bar sound equalizer (staggered sBar)
+Large clay mic button at bottom (54px circle)
+"Tap to respond" Syne Mono label
+Ghost CTA: "Prefer to talk to a person?" → S09_Request_Call
+
+─────────────────────────────────
+S07 — AI Chatbot Interface (MAIN CONVERSATION SCREEN)
+─────────────────────────────────
+This is a full persistent chatbot UI.
+
+Header:
+  Back button
+  AI avatar (teal cross in circle, 30px)
+  "Loan Doctor AI" + "Live" blinking teal dot
+  "Specialist" ghost button (clay outline, top-right) → S09
+
+Chat area (flex:1, scrollable):
+  Messages stream in with 850ms delay:
+    AI: "नमस्ते! आपका स्वागत है। किस purpose के लिए loan 
+         चाहते हैं?"
+    User: "Business expand के लिए — कपड़े की दुकान है।"
+    AI: "Business कितने साल पुराना है? Monthly turnover?"
+    User: "3 साल पुराना, ₹40,000 monthly।"
+    AI: "Aadhaar, PAN, 6 months bank statement available?"
+    User: "हाँ, सब available हैं।"
+    AI: "Perfect! Profile analyse हो रहा है…"
+    [1800ms pause → RESULT BLOCK appears inline]
+
+  RESULT BLOCK (full width inside chat):
+    Pill: blinking teal dot + "AI MATCHED 3 SCHEMES FOR YOU"
+    3 scheme cards (tappable → SchemeDetail, passes data):
+      Card 1: MUDRA Tarun | Up to ₹10L | 8.5% p.a. | 94%
+        "BEST MATCH" ribbon (clay, top-right corner)
+      Card 2: CGTMSE Scheme | Up to ₹5L | 9.2% p.a. | 87%
+      Card 3: PM SVANidhi | Up to ₹5L | 7% p.a. | 81%
+    Full-width clay CTA: "Explore All Schemes →" → SchemesBrowser
+    Ghost text link: "Talk to a specialist →" → S09
+
+Input bar (fixed bottom):
+  Text field: "Type or tap mic…"
+  Clay mic circle button (right)
+
+─────────────────────────────────
+SchemesBrowser — Blinkit-Style Scheme Browsing
+─────────────────────────────────
+Search bar
+Location pill (clay) → LocSheet (State + City dropdowns + GPS button)
+Filter button
+Central / State sliding toggle
+Category swimlanes (horizontal scroll per category):
+  Central: Business Loans · Small Traders · Agriculture · Women Schemes
+  State: Business Loans · Startups · Agriculture
+
+Scheme card (minWidth 152px):
+  Tag badge if applicable (clay, top)
+  Cross icon in clay bg square
+  Title + Ministry label
+  Amount (clay mono) + Rate (teal mono)
+  Tappable → SchemeDetail
+
+FLOATING CONSULTANT BUTTON (only in pre-purchase browse):
+  Bottom-right, 52px circle, clay bg
+  Person icon (white)
+  "Consult" label beneath
+  fabP pulsing ring animation
+  On tap → S09_Request_Call
+  Hide after hasPurchase=true
+
+Scheme Data — Central:
+  Business Loans:
+    MUDRA Tarun | PM Mudra Yojana | ₹10L | 8.5% | 5yr | tag:🔥 Popular
+    MUDRA Kishore | PM Mudra Yojana | ₹5L | 8.2% | 5yr
+    CGTMSE | Min. MSME | ₹5L | 9.2% | 7yr | tag: No Collateral
+  Small Traders:
+    PM SVANidhi | Min. Housing | ₹5L | 7% | 3yr | tag: ⚡ Fast
+    MUDRA Shishu | PM Mudra Yojana | ₹50K | Low | 3yr
+  Agriculture:
+    Kisan Credit Card | NABARD | ₹3L | 4% | 1yr | tag: ⚡ Fast
+    PM Fasal Bima | Min. Agriculture | Crop cover | 1.5%
+  Women Schemes:
+    Mahila Udyam Nidhi | SIDBI | ₹10L | 7.5% | 10yr | tag: Women Only
+    Stree Shakti | SBI | ₹25L | 0.5% off | 5yr
+
+Scheme Data — State (Tamil Nadu default):
+  Business: TNSCB Loan | ₹3L | 6.5% | 5yr
+            MSME TN | ₹10L | 8% | 7yr | tag: State Special
+  Startups: Kalaignar Startup | ₹5L | 0% | 3yr | tag: 0% Interest
+  Agriculture: NABARD Rural TN | ₹2L | 4% | 2yr
+
+─────────────────────────────────
+SchemeDetail — Full Scheme Page
+─────────────────────────────────
+Back button + scheme name header + tag chip
+
+YouTube video thumbnail:
+  Dark gradient bg, large play button centered
+  Duration pill bottom-right
+  Title overlay bottom-left with clay dot
+
+2×2 stats grid:
+  Loan Amount (clay) | Interest Rate (teal)
+  Tenure (teal) | Collateral (teal if None, amber otherwise)
+
+"✅ Eligibility Checklist" card:
+  4 items with teal check circles
+
+"📄 Documents Required" card:
+  7 items: Aadhaar · PAN · Photo · Bank Statement ·
+           Project Report (DPR) · Quotations · Category Certificate
+  Each with clay bullet dot
+
+"⚡ How It Works" card:
+  4 numbered steps (clay number circles):
+  1. Apply via Loan Doctor
+  2. Documents verified in 24hrs
+  3. Lender assigns case
+  4. Disbursed in 5–7 working days
+
+BEFORE PURCHASE — 2 CTAs:
+  Primary (clay): "Continue & Buy — Apply for [Scheme]" → Payment
+  Secondary (ghost): "Consult a Specialist First" → SpecialistConfirm
+
+AFTER PURCHASE — 1 CTA:
+  "Apply for [Scheme]" (clay)
+  No specialist CTA
+
+─────────────────────────────────
+SpecialistConfirm — Book Consultation
+─────────────────────────────────
+Agent card:
+  Clay avatar, "Ramesh K. — Senior Loan Advisor"
+  "Free 20-min · No commitment"
+  ★★★★★ 4.9 · "847 consultations done"
+
+Date row (horizontal scroll, 5 days):
+  Today · Tomorrow · Wed 5 · Thu 6 · Fri 7
+  Selected: clay pill
+
+Time slot grid (2 cols × 3 rows):
+  10:00 AM · 11:30 AM · 1:00 PM
+  2:30 PM · 4:00 PM · 5:30 PM
+  Selected: clay border + checkmark
+
+Scheme reference chip (clay) — scheme name pre-filled
+
+"Confirm Consultation" clay CTA → SpecialistBooked
+"Skip — Explore All Schemes" ghost text → SchemesBrowser
+
+─────────────────────────────────
+SpecialistBooked — Confirmation
+─────────────────────────────────
+Dark screen, teal glow
+Pulsing teal calendar/check icon
+"Consultation Confirmed!"
+3 info cards:
+  📱 Google Meet link sent to WhatsApp
+  📅 Date · Time · 20 minutes
+  📋 Ref: LD-CONSULT-2024-12 · [Scheme Name]
+Primary CTA (clay): "Explore All Schemes" → SchemesBrowser
+Ghost: "Go to Home" → MarketingHome
+
+─────────────────────────────────
+S09 — Request a Call
+─────────────────────────────────
+"Free Expert Consultation" teal info card
+Pre-filled name + mobile
+Loan purpose dropdown (6 options)
+3 time slot options (clay when selected):
+  Morning 9–12 / Afternoon 12–4 / Evening 4–7
+"Request Callback" clay CTA → S10_CallBooked
+"100% free · No spam · Cancel anytime" notice
+
+─────────────────────────────────
+S10 — Call Booked
+─────────────────────────────────
+Dark screen, teal glow
+Pulsing teal call icon
+"Callback Booked!"
+Agent card: Ramesh K., time slot, REF: LD-CALL-2024-041
+WhatsApp confirmation notice
+"Explore App While You Wait" clay CTA → MarketingHome
+
+─────────────────────────────────
+MarketingHome (accessible after call booked)
+─────────────────────────────────
+Hero: AI eligibility CTA + "Talk to Specialist" ghost
+Achievement bar: ₹47Cr+ · 50K+ · 200+ · 98%
+Live Offers (horizontal scroll, pulsing badges)
+Video Library (horizontal scroll, 3 thumbnails)
+Success Stories (3 testimonial cards with stars)
+Bottom repeat CTA
+
+─────────────────────────────────
+Payment Screen
+─────────────────────────────────
+Header: "Choose Your Plan" / scheme name
+
+TOKEN AMOUNT card (₹999):
+  Features: Agent in 2hrs, doc help, submission
+  Radio selector
+
+FULL SERVICE card (₹10,000):
+  "RECOMMENDED ★" teal ribbon
+  Features: Priority, dedicated agent, 1hr response,
+  end-to-end, 6mo follow-up
+  Radio selector
+
+3 payment tiles: GPay/UPI · Card · Net Banking
+"Pay [₹999 / ₹10,000] Securely" clay CTA + lock icon
+Spinner 1.8s → PaySuccess
+"256-bit SSL · Razorpay Secured" notice
+
+─────────────────────────────────
+PaySuccess
+─────────────────────────────────
+Dark screen, teal glow
+Animated SVG strokeIn checkmark
+"Payment Successful!"
+3 cards:
+  Invoice sent to WhatsApp (wa icon)
+  Ramesh K. — Your Agent (clay)
+  Case Ref: LD-2024-038 (teal)
+"Open My Application" clay CTA → Customer Main App
+
+─────────────────────────────────
+CUSTOMER MAIN APP (5-tab nav, post purchase)
+─────────────────────────────────
+Tabs: Home · Schemes · My App · Chat · Profile
+
+FLOATING MIC BUTTON (all tabs except Chat):
+  Bottom-right, 52px clay circle, above nav bar
+  Mic icon (white), fabP pulsing ring
+  Tooltip: "Ask AI"
+  On tap → opens S07 chatbot as overlay
+  Hidden when navTab === "chat"
+
+TAB 1 — HOME (full marketing + status hybrid):
+  Application status card (clay border):
+    "MUDRA Tarun Loan" + "IN REVIEW" amber badge
+    Progress bar 35% animates on mount (clay→amber gradient)
+    4-step timeline:
+      Applied ✓ (clay) → Docs ✓ (clay) →
+      Review ⟳ (amber pulsing dot) → Approved ○ (gray)
+  Quick actions: "Upload Docs" → myapp tab | "Chat Agent" → chat tab
+  Achievement strip: ₹47Cr+ · 50K+ · 98%
+  Video Library (horizontal scroll, 3 videos)
+  Success Stories (3 testimonial cards)
+  Live Offers (horizontal scroll, 2 offer cards)
+  Other Schemes You May Like (horizontal scroll, 3 chips)
+
+TAB 2 — SCHEMES:
+  Same SchemesBrowser component
+  showSpec=false (no specialist CTA after purchase)
+  No floating consultant button
+  Floating mic remains
+
+TAB 3 — MY APPLICATION (full dashboard):
+  Header card (clay border):
+    "MY APPLICATION" mono
+    "MUDRA Tarun Loan" serif + "LD-2024-038" clay chip
+    "IN REVIEW" amber badge
+    Large progress bar 35% (animates 0→35% on mount)
+    "Step 2 of 4 — Document Verification"
+  
+  APPLICATION JOURNEY section (vertical timeline):
+    ✓ Application Submitted — Mar 1 · 10:32 AM (clay, done)
+    ✓ Payment Received ₹999 — Mar 1 · 10:35 AM (clay, done)
+    ⟳ Document Verification (amber, current, pulsing dot):
+      "2 of 4 documents uploaded"
+      Inline mini doc status:
+        Aadhaar ✓ · PAN ✓ · Bank Statement ✗ · Business Proof ✗
+      Small "Upload Missing Docs" clay button → upload sheet
+    ○ Loan Disbursement (gray, future):
+      "Expected 5–7 working days after approval"
+  
+  DOCUMENT CHECKLIST section:
+    "2 of 4 uploaded" + progress bar (clay→amber)
+    7 document cards:
+      Aadhaar Card ✓ (teal border)
+      PAN Card ✓ (teal border)
+      Photograph ✗ (clay border + Upload button)
+      Bank Statement ✗ (clay border + Upload button +
+        warning: "All 6 months must be from same account")
+      Project Report (DPR) ✗ (clay border + Upload button)
+      Quotations ✗ (clay border + Upload button)
+      Category Certificate — Optional (gray border + Add button)
+    Upload tap → Sheet with Camera / Browse Files
+    Tapping option → marks doc uploaded, clay→teal transition
+    Encryption notice (lock icon)
+    "Submit All Documents" CTA — disabled until 7/7 required, then clay
+  
+  RECENT UPDATES section:
+    "Documents received" — teal left border — Mar 2 · 9:41 AM
+    "Action required: Upload Bank Statement" — clay left border — Today
+
+TAB 4 — CHAT:
+  Agent header:
+    Avatar with online teal dot
+    "Ramesh K." + "Loan Advisor · MUDRA Tarun"
+    Call + video icons right
+  Case reference strip: LD-2024-038 (clay)
+  4 messages (staggered msgIn):
+    System: "Case registered. Ramesh K. assigned." (teal full-width)
+    Agent: "Namaste Rahul ji! Please upload Bank Statement…"
+    User: "Done, uploaded ✓"
+    System: "Documents received. Review in progress." (teal full-width)
+  Input bar + mic button (NO floating mic on this tab)
+
+TAB 5 — PROFILE:
+  "RK" initials avatar + Rahul Kumar + Edit pill
+  Mini app card: MUDRA Tarun + IN REVIEW + 35% bar
+  Settings groups:
+    ACCOUNT: Language · Notifications toggle (working) · Mobile
+    SUPPORT: Contact Agent · Help & FAQ · Report Issue
+    LEGAL: Privacy Policy · Terms of Service
+  Log Out ghost button
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ROLE 2 — SALES EXECUTIVE APP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+After role select → Sales Executive Home
+
+Bottom nav (4 tabs): Home · Leads · Checklist · Profile
+
+─────────────────────────────────
+SE_Home — Sales Executive Dashboard
+─────────────────────────────────
+Header:
+  "Good morning 👋"
+  "Arjun Singh — Sales Executive"
+  Teal role badge: "SALES EXEC"
+  Bell icon with notification dot
+
+WEEKLY EARNINGS TRACKER CARD (most prominent, full width):
+  Background: dark gradient with teal glow
+  "THIS WEEK'S COLLECTION" mono label
+  Large number: ₹38,400 (countUp animation on mount)
+  Current slab indicator:
+    "GROWTH PERFORMER" amber badge
+    "8% incentive active"
+  Progress bar showing gap to next slab:
+    Clay fill to 78% (₹38,400 of ₹50,000)
+    "₹11,600 more to reach HIGH PERFORMER (10%)"
+    Animated shimmer on bar
+  This week's incentive: ₹3,072 (8% of ₹38,400)
+  "If you reach ₹50,000 → earn ₹5,000 + ₹1,500 bonus"
+  
+  Slab ladder visualization (4 rows):
+    ○ Starter  ₹25K–₹35K   5%     (gray)
+    ✓ Growth   ₹35K–₹50K   8%     (teal — CURRENT)
+    ○ High     ₹50K–₹1L    10% + ₹1,500 bonus  (gray)
+    ○ Superstar ₹1L+       10% + ₹3,000 bonus  (gray)
+  
+  "Week: Sunday – Saturday" Syne Mono footer
+
+KPI ROW (4 cards, horizontal):
+  My Leads: 12 | Converted: 4 | Pending: 6 | Approved: 2
+  Each card: Syne Mono number (large, colored), label below
+
+RECENT LEADS section:
+  3 lead cards:
+    Lead name + loan type + amount + status chip
+    Status chips: PENDING (amber) · APPROVED (teal) · OBJECTION (red)
+  "View All Leads →" → Leads tab
+
+OBJECTION ALERTS:
+  Red-bordered card if any:
+    "⚠️ Objection on Ravi Kumar's application"
+    "Missing: Bank statement page 3"
+    "Resolve Now" clay button
+
+─────────────────────────────────
+SE_Leads — Lead Management
+─────────────────────────────────
+Header: "My Leads" + "New Lead +" clay button (top-right)
+Search bar
+Filter chips: All · Pending · Approved · Objection · Rejected
+
+Lead cards (vertical list):
+  Lead avatar (initials) + Name + Loan type
+  Amount chip + Scheme chip + Status chip
+  "Last updated: Today 2:30 PM" timestamp
+  Tappable → Lead Detail screen
+
+New Lead button → SE_NewLead form
+
+SE_NewLead — Create Lead (multi-step form):
+  Step indicator: 1 → 2 → 3 → 4 → 5 → 6
+  
+  STEP 1 — Basic Applicant Details:
+    Full Name (as per Aadhaar)
+    Date of Birth
+    PAN Number
+    Mobile number (Aadhaar-linked?) toggle
+    Current address same as Aadhaar? toggle
+    Category dropdown: General/SC/ST/OBC/Minority/Women
+  
+  STEP 2 — Eligibility Check:
+    Prior govt subsidy loan? Yes/No toggle
+    First business under this scheme? Yes/No toggle
+    Current occupation (text)
+    Approx monthly income (₹)
+    Existing loans running? Yes/No + amount
+    Approx CIBIL score (slider or text)
+  
+  STEP 3 — Business & Project Details:
+    Type of business proposed (dropdown)
+    Total project cost (₹)
+    Promoter contribution available? Yes/No
+    Machinery quotations available? Yes/No
+    Business location finalized? Yes/No
+    IF EXISTING BUSINESS:
+      Udyam Registration? Yes/No
+      GST Registration? Yes/No
+      Bank statement 6 months? Yes/No
+  
+  STEP 4 — Financial Validation:
+    Savings/Current account? Yes/No
+    Ready to invest margin money? Yes/No
+    NPA/Overdue history? Yes/No
+  
+  STEP 5 — Document Upload:
+    7 document upload cards:
+      Aadhaar Copy · PAN Copy · Photograph · Bank Statement ·
+      Project Report (DPR) · Quotations · Category Certificate
+    Each: "Upload" → Sheet (Camera / Browse)
+    Uploaded: teal border + filename
+    Not uploaded: clay border + upload button
+    Progress: "X of 7 uploaded"
+  
+  STEP 6 — Final Declaration + Submission:
+    4 customer confirmation toggles (all must be ON to enable submit):
+      "Customer confirms all information is correct"
+      "Customer confirms documents are genuine"
+      "Customer understands approval depends on bank"
+      "Customer is ready for digital submission"
+    
+    Backend Officer section:
+      Officer name field
+      Today's date (auto-filled)
+      "Approve for Digital Submission" clay CTA
+    
+    Submit CTA: disabled until all 4 toggles ON + officer name filled
+    "Submit Application" clay CTA → success animation
+  
+  Each step: "Next →" clay CTA + "← Back" ghost
+  Progress bar at top showing step completion
+
+─────────────────────────────────
+SE_Checklist — Pre-Digital Validation Checklist
+─────────────────────────────────
+Standalone checklist view for existing leads.
+Shows all 6 sections in accordion format.
+Each section expandable, shows fields with:
+  Customer answer (filled/pending)
+  Verified toggle (Yes/No)
+  Status: COMPLETE (teal) / INCOMPLETE (clay) / PENDING (amber)
+
+Overall checklist score: "4 of 6 sections complete"
+Progress bar (teal)
+"Mark as Verified & Submit" clay CTA (disabled until 6/6)
+
+─────────────────────────────────
+SE_Profile — Sales Exec Profile
+─────────────────────────────────
+Avatar (initials) + Name + Executive ID
+Teal "SALES EXECUTIVE" role badge
+Commission summary card:
+  This month earned: ₹12,400
+  This week: ₹3,072
+  Pending payout: ₹8,200
+Settings: Language · Notifications · Change PIN · Log Out
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ROLE 3 — TEAM LEADER APP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Bottom nav (4 tabs): Home · Team · Leads · Profile
+
+─────────────────────────────────
+TL_Home — Team Leader Dashboard
+─────────────────────────────────
+Header:
+  "Priya Menon — Team Leader"
+  Amber role badge: "TEAM LEADER"
+
+TEAM WEEKLY TARGET CARD (most prominent):
+  "TEAM WEEKLY COLLECTION" mono label
+  ₹1,84,200 (countUp on mount, large serif)
+  Target: ₹2,50,000
+  Progress bar: 73.6% fill (clay→amber gradient)
+  "₹65,800 more to unlock your 1% incentive (₹2,500)"
+  
+  If target crossed:
+    Teal glow card
+    "🎉 Target Achieved! Your incentive: ₹X"
+  
+  Week: Sunday–Saturday progress indicator
+
+TL KPI ROW (horizontal scroll, 5 cards):
+  Team Size: 8 | Total Leads: 64 | Converted: 22
+  Pending: 31 | Objections: 4
+
+TEAM PERFORMANCE TABLE:
+  Each team member row:
+    Avatar + Name
+    Leads this week + amount collected
+    Progress mini-bar
+    Current slab badge (Starter/Growth/High/Superstar)
+  "Best Performer: Arjun Singh — ₹62,400 🏆" highlighted card (amber border)
+
+ESCALATION ALERTS:
+  Red border card: cases needing TL attention
+  "Resolve / Escalate to Admin" buttons
+
+─────────────────────────────────
+TL_Team — Team Management
+─────────────────────────────────
+List of all team members:
+  Each card: avatar + name + exec ID + leads count + status
+  Status: Active (teal) · Inactive (gray)
+  
+  Tap any member → Member Detail:
+    Full KPI breakdown
+    All their leads (read-only)
+    Weekly collection history
+    Slab progression chart (bar chart visual)
+  
+  "Assign Lead" button → lead picker → reassign to member
+  
+  Lead assignment: 
+    Opens lead list → checkbox select → 
+    "Assign to [Member]" clay CTA
+
+─────────────────────────────────
+TL_Leads — All Team Leads
+─────────────────────────────────
+All leads across the team (not just own)
+Filter: By member · By status · By scheme · By date
+Each lead card: same as SE but shows "Assigned to: [Name]"
+Tap → Lead Detail (read + approve pre-verification)
+  "Approve Pre-Verification" teal CTA
+  "Request Correction" clay CTA → objection note
+  "Escalate to Admin" red ghost CTA
+
+─────────────────────────────────
+TL_Profile
+─────────────────────────────────
+Same structure as SE_Profile
+Amber "TEAM LEADER" role badge
+Commission: Own incentive + team % breakdown
+Settings same
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ROLE 4 — FRANCHISEE APP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Bottom nav (5 tabs): Home · Team · Applications · Finance · Profile
+
+─────────────────────────────────
+FR_Home — Franchisee Dashboard
+─────────────────────────────────
+Header:
+  "Chennai Franchise — Suresh Iyer"
+  Purple role badge: "FRANCHISEE"
+  Franchise ID: FR-TN-0024
+
+REVENUE OVERVIEW CARD (prominent, purple glow):
+  "THIS MONTH REVENUE" mono
+  ₹4,82,000 (countUp on mount)
+  Commission earned: ₹28,920
+  Pending payout: ₹14,400
+  "Download Statement →" ghost button
+
+4 KPI cards (2×2 grid):
+  Total Leads: 186 | Approvals: 64
+  Active Execs: 12 | Objections: 8
+
+BRANCH PERFORMANCE section:
+  Scheme-wise bar chart (visual bars, no library):
+    MUDRA Tarun: 28 cases (tallest, clay)
+    PM SVANidhi: 18 cases (teal)
+    CGTMSE: 12 cases (amber)
+    Others: 6 (gray)
+  
+  Bank-wise approval ratio:
+    SBI: 78% (teal pill)
+    Union Bank: 65% (amber pill)
+    Canara: 55% (red pill)
+
+MARKETING SECTION:
+  "📣 Latest Campaign" card:
+    Campaign name + dates + "Download Creative" clay button
+  Scheme updates: 2 notification cards
+
+─────────────────────────────────
+FR_Team — Team Management
+─────────────────────────────────
+Tabs: Team Leaders (3) · Sales Execs (12)
+
+Team Leader cards:
+  Avatar + name + team size + this week's collection
+  Tap → TL performance detail (all KPIs)
+
+Sales Exec list (paginated):
+  Same as TL view
+  
+"+ Invite Sales Executive" clay FAB (bottom-right):
+  Form: Name + Mobile + Email + "Send Invite" CTA
+
+─────────────────────────────────
+FR_Applications — All Applications
+─────────────────────────────────
+Filter: All · Pending · Approved · Objection · Rejected
+Each application card:
+  Applicant name + scheme + amount + status chip
+  Assigned to (exec name)
+  Last updated timestamp
+  Tap → Application Detail:
+    Full checklist view (read-only)
+    Document status
+    "Pre-Check & Forward to Backend" clay CTA
+    "Escalate to Admin" red ghost CTA
+    "Mark Objection" amber CTA
+
+─────────────────────────────────
+FR_Finance — Commission & Revenue
+─────────────────────────────────
+Monthly revenue card (current month):
+  Total collection + franchise % share + pending payout
+
+Commission breakdown table:
+  Row per case: Applicant name · Scheme · Amount ·
+  Disbursed date · Commission % · Commission ₹ · Status
+
+"Download Report" clay CTA (PDF icon)
+"Pending Payouts" section:
+  3 payout cards with expected date
+
+─────────────────────────────────
+FR_Profile
+─────────────────────────────────
+Franchise details card:
+  Franchise ID + Region + Contract period
+  Purple "FRANCHISEE" badge
+  KYC status: Verified ✓
+  Digital Agreement: Signed Mar 1, 2024 ✓
+Commission structure (as configured by admin):
+  % on disbursement · % on subsidy · Override % · Bonus targets
+Settings + Log Out
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ROLE 5 — ADMINISTRATOR APP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Bottom nav (5 tabs): Home · Users · Applications · Schemes · Settings
+
+─────────────────────────────────
+AD_Home — Admin Command Center
+─────────────────────────────────
+Header:
+  "Admin Panel — Loan Doctor"
+  Blue role badge: "ADMINISTRATOR"
+  Date + time
+
+PLATFORM OVERVIEW (5 metric cards, horizontal scroll):
+  Total Users: 2,841 (countUp)
+  Active Applications: 486
+  Approved This Month: 142
+  Total Disbursed: ₹47Cr+
+  Pending Objections: 23
+
+SYSTEM HEALTH row:
+  3 status indicators:
+    API: Operational (teal dot + label)
+    Rule Engine: Active (teal)
+    Payments: Active (teal)
+
+APPLICATIONS FUNNEL (visual funnel):
+  Leads Created: 486
+  Docs Verified: 312
+  Sent to Bank: 198
+  Approved: 142
+  Disbursed: 118
+  Each with number and drop-off %
+
+OBJECTION QUEUE (red border):
+  Top 3 pending objections with action buttons
+  "View All 23 →"
+
+RECENT ACTIVITY FEED:
+  Timestamped list:
+    "New franchisee onboarded — Chennai (FR-TN-0024)"
+    "₹8L disbursed — MUDRA Tarun — Ravi Kumar"
+    "Objection raised — CGTMSE — Arjun's lead"
+    "New exec added under Priya Menon's team"
+
+─────────────────────────────────
+AD_Users — User Management
+─────────────────────────────────
+Tabs: Franchisees · Team Leaders · Sales Execs · Customers
+
+Each tab: searchable list with role badge
+User card: avatar + name + ID + status (Active/Inactive)
+Tap → User Detail:
+  Full profile + KPIs
+  Role badge + join date
+  Commission structure (for B2B roles)
+  Action buttons:
+    "Deactivate Account" (red ghost)
+    "Reset PIN" (amber)
+    "Edit Role" (clay)
+
+"+ Create User" clay FAB
+Form: Name · Mobile · Email · Role dropdown · Franchise assignment
+
+─────────────────────────────────
+AD_Applications — Full Application View
+─────────────────────────────────
+All applications across entire platform
+Filters: Status · Scheme · Franchise · Date range · Bank
+
+Application card: same as franchisee view
+Tap → Full Application Detail:
+  All 6 checklist sections (read + edit)
+  Document viewer placeholders
+  Timeline of all actions
+  Admin actions:
+    "Approve for Bank Submission" (teal CTA)
+    "Mark Objection + note" (amber CTA)
+    "Reject Application" (red ghost CTA)
+    "Reassign to Executive" (clay ghost)
+
+─────────────────────────────────
+AD_Schemes — Scheme Master Data
+─────────────────────────────────
+List of all schemes (Central + State)
+Each scheme card:
+  Name + Ministry + Status (Active/Inactive toggle)
+  Key stats: Amount · Rate · Tenure
+
+Tap → Scheme Edit:
+  Edit all fields: name · ministry · amount range ·
+  interest rate · tenure · eligibility rules ·
+  required documents · category · state applicability
+  Subsidy percentage (editable ONLY by admin)
+  "Save Changes" clay CTA
+  "Deactivate Scheme" red ghost
+
+"+ Add New Scheme" clay FAB
+
+─────────────────────────────────
+AD_Settings — System Configuration
+─────────────────────────────────
+Sections (accordion):
+
+COMMISSION RULES:
+  SE slab table (editable %): 
+    Starter / Growth / High / Superstar thresholds + rates
+  TL incentive %: currently 1% (editable)
+  Franchisee % (editable per franchise)
+  Bonus amounts (editable)
+  "Save Commission Rules" clay CTA
+
+ELIGIBILITY RULE ENGINE:
+  Rule cards: each rule shows condition + action
+  Toggle rules on/off
+  "Edit Rule" → rule editor
+  "Add New Rule" ghost CTA
+
+WEEK CONFIGURATION:
+  Week start day: Sunday (dropdown)
+
+NOTIFICATION SETTINGS:
+  Toggle: objection alerts · approval alerts · payout alerts
+
+AUDIT LOG link:
+  "View full audit trail →" → list of all system actions
+  with timestamp + user + action + IP
+
+BANK INTEGRATION:
+  Connected banks list with status
+  API key status (masked)
+
+"Danger Zone" section (red border):
+  "Reset Platform Data" (disabled in prototype)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+NAVIGATION ARCHITECTURE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+App state:
+  role: "customer" | "sales_exec" | "team_leader" | 
+        "franchisee" | "admin"
+  screen: string (current screen name)
+  history: array (for back navigation)
+  navTab: string (current bottom nav tab)
+  hasPurchase: boolean (customer only)
+  selectedScheme: object (scheme data passed to detail page)
+
+go(screenName, data?) — push to history, navigate
+back() — pop history
+onNav(tabId) — switch tab, clear history
+
+Role → Home routing:
+  customer     → "s06" (Voice AI)
+  sales_exec   → "se_home"
+  team_leader  → "tl_home"
+  franchisee   → "fr_home"
+  admin        → "ad_home"
+
+Each role renders its own bottom nav component.
+Role badge always visible in home header.
+"Switch Role" option in every Profile tab (for prototype demo).
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+UI POLISH RULES (apply everywhere)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- Every number on dashboards uses countUp animation on mount
+- All progress bars animate from 0 to target on mount (800ms)
+- Skeleton loading state (shimmer) shows briefly before data
+- Every list has empty state design (no blank screens)
+- Every form field has a filled/active state (teal border on focus)
+- Status chips: APPROVED teal · PENDING amber · REJECTED red · 
+  OBJECTION red · IN REVIEW amber · SUBMITTED blue
+- All CTAs show loading spinner on tap before navigation
+- Bottom sheets always have drag handle + backdrop blur
+- Section headers always in Syne Mono caps with spacing
+- Role color used consistently per role (borders, 
+  badges, active nav items)
+- key={screen+navTab} on render container for fadeUp on 
+  every screen change
+- Dynamic island always at top, z-index 999
