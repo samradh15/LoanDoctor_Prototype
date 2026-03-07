@@ -1,72 +1,125 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 // =========================================================================
 // DESIGN SYSTEM & TOKENS (Shared across all roles)
 // =========================================================================
 const C = {
-    bg: "#111510",
-    card1: "#1C2118",
-    card2: "#242B20",
-    clay: "#C84B0C",        // Customer accent, primary action
-    teal: "#4CC9A0",        // Sales Exec accent, success, AI
-    amber: "#F5A623",       // Team Leader accent, pending, warning
-    red: "#E05252",         // Rejection, alert
-    purple: "#A78BFA",      // Franchisee accent
-    blue: "#60A5FA",        // Administrator accent
-    textPrimary: "#EDF0E8",
-    textMuted: "#7A8072",
-    border: "rgba(237,240,232,0.07)",
-    borderMid: "rgba(237,240,232,0.12)"
+    // Backgrounds
+    bg:           "#0F0F0F",
+    card1:        "#1A1A1A",   // standard surface
+    card2:        "#242424",   // elevated / input surface
+    border:       "#2E2E2E",
+    borderMid:    "#3A3A3A",
+
+    // Brand
+    clay:         "#E8570C",   // primary orange
+    primary:      "#E8570C",
+    primaryDim:   "rgba(232,87,12,0.12)",
+    primaryGlow:  "rgba(232,87,12,0.25)",
+
+    // Semantic
+    teal:         "#22C55E",   // success green (legacy alias)
+    success:      "#22C55E",
+    successDim:   "rgba(34,197,94,0.10)",
+    amber:        "#F59E0B",   // warning
+    warning:      "#F59E0B",
+    warningDim:   "rgba(245,158,11,0.10)",
+    red:          "#EF4444",   // danger
+    danger:       "#EF4444",
+    dangerDim:    "rgba(239,68,68,0.10)",
+    blue:         "#3B82F6",   // info / admin
+    info:         "#3B82F6",
+    infoDim:      "rgba(59,130,246,0.10)",
+    purple:       "#A78BFA",   // franchisee
+    violetDim:    "rgba(167,139,250,0.12)",
+
+    // Text
+    textPrimary:   "#F5F5F5",
+    textSecondary: "#A3A3A3",
+    textMuted:     "#6B6B6B",
 };
 
 const F = {
     serif: "'Fraunces', serif",
-    sans: "'Plus Jakarta Sans', sans-serif",
-    mono: "'Syne Mono', monospace"
+    sans:  "'Plus Jakarta Sans', sans-serif",
+    mono:  "'Syne Mono', monospace"
 };
 
 const px = (n) => `${n}px`;
 
-// Utility functions for UI elements
+// Status chip factory — semantic colours per README spec
+const statusChip = (status) => {
+    const map = {
+        APPROVED:   { bg: "rgba(34,197,94,.12)",   border: "rgba(34,197,94,.25)",   color: "#22C55E" },
+        VERIFIED:   { bg: "rgba(34,197,94,.12)",   border: "rgba(34,197,94,.25)",   color: "#22C55E" },
+        ACTIVE:     { bg: "rgba(34,197,94,.12)",   border: "rgba(34,197,94,.25)",   color: "#22C55E" },
+        PENDING:    { bg: "rgba(245,158,11,.12)",  border: "rgba(245,158,11,.25)",  color: "#F59E0B" },
+        "IN REVIEW":{ bg: "rgba(245,158,11,.12)",  border: "rgba(245,158,11,.25)",  color: "#F59E0B" },
+        SUBMITTED:  { bg: "rgba(59,130,246,.12)",  border: "rgba(59,130,246,.25)",  color: "#3B82F6" },
+        OBJECTION:  { bg: "rgba(239,68,68,.12)",   border: "rgba(239,68,68,.25)",   color: "#EF4444" },
+        REJECTED:   { bg: "rgba(239,68,68,.12)",   border: "rgba(239,68,68,.25)",   color: "#EF4444" },
+        INACTIVE:   { bg: "rgba(107,107,107,.12)", border: "rgba(107,107,107,.25)", color: "#6B6B6B" },
+    };
+    const s = map[status?.toUpperCase()] || map.PENDING;
+    return {
+        background: s.bg, color: s.color,
+        border: `1px solid ${s.border}`,
+        fontFamily: F.mono, fontSize: px(9), letterSpacing: "0.5px",
+        padding: "3px 8px", borderRadius: px(6),
+        display: "inline-flex", alignItems: "center", justifyContent: "center"
+    };
+};
+
+// Generic chip (for categories, non-status use)
 const chip = (bg, color, border) => ({
     background: bg, color, border: `1px solid ${border}`,
     fontFamily: F.mono, fontSize: px(9), fontWeight: 600,
-    padding: "4px 8px", borderRadius: px(5), display: "inline-flex",
+    padding: "4px 8px", borderRadius: px(6), display: "inline-flex",
     alignItems: "center", justifyContent: "center", letterSpacing: "0.5px"
 });
 
-const cta = (color = C.clay, extra = {}) => ({
-    width: "100%", height: px(52), background: color, color: "#fff",
-    fontFamily: F.sans, fontWeight: 600, fontSize: px(14),
-    border: "none", borderRadius: px(13), display: "flex",
-    alignItems: "center", justifyContent: "center", gap: px(8),
-    boxShadow: `0 4px 20px ${color}59`, transition: "all .2s",
-    cursor: "pointer", ...extra
-});
+// Primary CTA with gradient
+const cta = (color = C.clay, extra = {}) => {
+    const isOrange = color === C.clay || color === C.primary;
+    const isGreen  = color === C.teal  || color === C.success;
+    const bg = isOrange
+        ? "linear-gradient(135deg,#E8570C,#F97316)"
+        : isGreen
+        ? "linear-gradient(135deg,#16A34A,#22C55E)"
+        : color;
+    return {
+        width: "100%", height: px(54), background: bg, color: "#fff",
+        fontFamily: F.sans, fontWeight: 700, fontSize: px(15),
+        border: "none", borderRadius: px(14), display: "flex",
+        alignItems: "center", justifyContent: "center", gap: px(8),
+        boxShadow: `0 6px 24px ${color}66`, transition: "all .15s",
+        cursor: "pointer", ...extra
+    };
+};
 
 const ghostCta = (color = C.textMuted, extra = {}) => ({
-    width: "100%", height: px(52), background: "transparent", color: color,
-    fontFamily: F.sans, fontWeight: 600, fontSize: px(13),
-    border: "none", borderRadius: px(13), display: "flex",
+    width: "100%", height: px(50), background: "transparent", color: color,
+    fontFamily: F.sans, fontWeight: 600, fontSize: px(14),
+    border: `1.5px solid ${C.border}`, borderRadius: px(14), display: "flex",
     alignItems: "center", justifyContent: "center", gap: px(8),
     cursor: "pointer", ...extra
 });
 
-// Role-specific colors mapping
+// Role accent colours per README spec
 const roleColor = {
-    customer: C.clay,
-    sales_exec: C.teal,
-    team_leader: C.amber,
-    franchisee: C.purple,
-    admin: C.blue
+    customer:     "#E8570C",
+    sales_exec:   "#22C55E",
+    team_leader:  "#F59E0B",
+    franchisee:   "#A78BFA",
+    admin:        "#3B82F6"
 };
 
 const roleLabel = {
-    customer: "CUSTOMER",
-    sales_exec: "SALES EXEC",
-    team_leader: "TEAM LEADER",
-    franchisee: "FRANCHISEE",
-    admin: "ADMINISTRATOR"
+    customer:     "CUSTOMER",
+    sales_exec:   "SALES EXEC",
+    team_leader:  "TEAM LEADER",
+    franchisee:   "FRANCHISEE",
+    admin:        "ADMINISTRATOR"
 };
 
 // =========================================================================
@@ -115,32 +168,45 @@ function StyleBlock() {
     return (
         <style dangerouslySetInnerHTML={{
             __html: `
-        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;600;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Syne+Mono&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne+Mono&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
         ::-webkit-scrollbar { display: none; }
-        body { background: #0A0A0A; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: 'Plus Jakarta Sans', sans-serif; overflow: hidden; }
+        body { background: #080808; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: 'Plus Jakarta Sans', sans-serif; overflow: hidden; }
         #root { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
-        .app-frame { width: 375px; height: 812px; border-radius: 46px; background: ${C.bg}; position: relative; overflow: hidden; box-shadow: 0 0 0 1px rgba(255,255,255,.05), 0 20px 60px rgba(0,0,0,.8); outline: 1px solid rgba(255,255,255,.1); outline-offset: -1px; }
-        .sc { width: 100%; height: 100%; position: absolute; top: 0; left: 0; overflow-x: hidden; overflow-y: auto; color: ${C.textPrimary}; animation: fadeUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .app-frame { width: 375px; height: 812px; border-radius: 46px; background: ${C.bg}; position: relative; overflow: hidden; box-shadow: 0 0 0 1px rgba(255,255,255,.06), 0 30px 80px rgba(0,0,0,.9); }
+        .sc { width: 100%; height: 100%; position: absolute; top: 0; left: 0; overflow-x: hidden; overflow-y: auto; color: ${C.textPrimary}; animation: fadeUp 0.3s cubic-bezier(0.16,1,0.3,1) both; }
         .dynamic-island { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 116px; height: 32px; background: #000; border-radius: 16px; z-index: 999; }
-        @keyframes fadeUp { 0% { opacity: 0; transform: translateY(15px); } 100% { opacity: 1; transform: translateY(0); } }
+        .tappable { transition: transform 0.15s cubic-bezier(0.16,1,0.3,1); cursor: pointer; }
+        .tappable:active { transform: scale(0.97); }
+        button { -webkit-tap-highlight-color: transparent; }
+        @keyframes fadeUp { 0% { opacity: 0; transform: translateY(18px); } 100% { opacity: 1; transform: translateY(0); } }
         @keyframes slideUp { 0% { transform: translateY(100%); } 100% { transform: translateY(0); } }
-        @keyframes popIn { 0% { opacity: 0; transform: scale(0.6); } 50% { transform: scale(1.1); } 100% { opacity: 1; transform: scale(1); } }
-        @keyframes rA { 0% { transform: scale(1); opacity: .8; } 50% { transform: scale(1.6); opacity: 0; } 100% { transform: scale(1.6); opacity: 0; } }
-        @keyframes rB { 0% { transform: scale(1); opacity: .6; } 50% { transform: scale(1.4); opacity: 0; } 100% { transform: scale(1.4); opacity: 0; } }
-        @keyframes rC { 0% { transform: scale(1); opacity: .4; } 50% { transform: scale(1.2); opacity: 0; } 100% { transform: scale(1.2); opacity: 0; } }
-        @keyframes sBar { 0%, 100% { transform: scaleY(0.3); } 50% { transform: scaleY(1); } }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes msgIn { 0% { opacity: 0; transform: translateY(10px) scale(0.98); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
-        @keyframes strokeIn { to { stroke-dashoffset: 0; } }
-        @keyframes fabP { 0% { box-shadow: 0 0 0 0 rgba(200,75,12,.6); } 70% { box-shadow: 0 0 0 12px rgba(200,75,12,0); } 100% { box-shadow: 0 0 0 0 rgba(200,75,12,0); } }
-        @keyframes fabPTeal { 0% { box-shadow: 0 0 0 0 rgba(76,201,160,.6); } 70% { box-shadow: 0 0 0 12px rgba(76,201,160,0); } 100% { box-shadow: 0 0 0 0 rgba(76,201,160,0); } }
-        @keyframes badgeP { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-        @keyframes dotP { 0% { box-shadow: 0 0 0 0 rgba(245,166,35,.5); } 70% { box-shadow: 0 0 0 6px rgba(245,166,35,0); } 100% { box-shadow: 0 0 0 0 rgba(245,166,35,0); } }
-        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-        .shimmer-bg { background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0) 100%); background-size: 200% 100%; animation: shimmer 2s infinite linear; }
+        @keyframes slideDown { 0% { transform: translateY(-100%); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+        @keyframes slideInRight { 0% { opacity: 0; transform: translateX(32px); } 100% { opacity: 1; transform: translateX(0); } }
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0); } 60% { transform: scale(1.1); } 100% { opacity: 1; transform: scale(1); } }
+        @keyframes bounceIn { 0% { transform: scale(0); } 60% { transform: scale(1.15); } 100% { transform: scale(1); } }
+        @keyframes rA { 0%,100% { transform: scale(1.00); opacity: 0.50; } 50% { transform: scale(1.10); opacity: 0.08; } }
+        @keyframes rB { 0%,100% { transform: scale(1.00); opacity: 0.35; } 50% { transform: scale(1.07); opacity: 0.05; } }
+        @keyframes rC { 0%,100% { transform: scale(1.00); opacity: 0.20; } 50% { transform: scale(1.04); opacity: 0.03; } }
+        @keyframes sBar { 0%,100% { transform: scaleY(0.25); } 50% { transform: scaleY(1.00); } }
+        @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.15; } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes msgIn { 0% { opacity: 0; transform: translateY(8px); } 100% { opacity: 1; transform: translateY(0); } }
+        @keyframes strokeIn { from { stroke-dashoffset: 200; } to { stroke-dashoffset: 0; } }
+        @keyframes fabP { 0%,100% { box-shadow: 0 8px 28px rgba(232,87,12,0.45), 0 0 0 0px rgba(232,87,12,0.15); } 50% { box-shadow: 0 8px 28px rgba(232,87,12,0.45), 0 0 0 10px rgba(232,87,12,0.00); } }
+        @keyframes badgeP { 0%,100% { transform: scale(1.00); } 50% { transform: scale(1.04); } }
+        @keyframes dotP { 0%,100% { transform: scale(1.0); opacity: 1; } 50% { transform: scale(1.6); opacity: 0.6; } }
+        @keyframes shimmer { 0% { background-position: -300px 0; } 100% { background-position: 300px 0; } }
+        @keyframes confettiDrop { 0% { transform: translateY(-10px) rotate(0deg); opacity: 1; } 100% { transform: translateY(60px) rotate(360deg); opacity: 0; } }
+        @keyframes toastIn { 0% { opacity: 0; transform: translateY(-16px); } 100% { opacity: 1; transform: translateY(0); } }
+        @keyframes toastOut { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-16px); } }
+        @keyframes progressFill { from { width: 0%; } }
+        .skel { background: linear-gradient(90deg,#1A1A1A 0%,#242424 50%,#1A1A1A 100%); background-size: 300% 100%; animation: shimmer 1.5s ease infinite; border-radius: 8px; }
+        .shimmer-bg { background: linear-gradient(90deg,rgba(255,255,255,0) 0%,rgba(255,255,255,0.04) 50%,rgba(255,255,255,0) 100%); background-size: 200% 100%; animation: shimmer 2s infinite linear; }
+        .hide-scroll { scrollbar-width: none; }
         .hide-scroll::-webkit-scrollbar { display: none; }
+        input { outline: none; }
+        input::placeholder { color: #6B6B6B; }
       `}} />
     );
 }
@@ -148,13 +214,106 @@ function StyleBlock() {
 // =========================================================================
 // SHARED COMPONENTS
 // =========================================================================
+
+// Status Bar
 function SB({ extraSpace = false }) {
     const [t, setT] = useState(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
+    useEffect(() => {
+        const iv = setInterval(() => setT(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })), 30000);
+        return () => clearInterval(iv);
+    }, []);
     return (
-        <div style={{ height: px(44), display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 28px 0 22px", marginTop: extraSpace ? px(16) : 0, zIndex: 900 }}>
-            <span style={{ fontFamily: F.sans, fontSize: px(14), fontWeight: 600, color: C.textPrimary }}>{t}</span>
-            <div style={{ display: "flex", gap: px(1.5), marginLeft: px(4) }}>{[1, 1, 1].map((_, i) => <div key={i} style={{ width: px(4), height: px(6), background: "rgba(237,240,232,.4)", borderRadius: px(1) }} />)}</div>
+        <div style={{ height: px(50), display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 24px", marginTop: extraSpace ? px(10) : 0, flexShrink: 0 }}>
+            <span style={{ fontFamily: F.mono, fontSize: px(12), color: C.textMuted }}>{t}</span>
+            <div style={{ display: "flex", alignItems: "center", gap: px(5) }}>
+                {/* signal bars */}
+                {[10,14,18].map((h, i) => <div key={i} style={{ width: px(3), height: px(h), background: "rgba(245,245,245,.35)", borderRadius: px(1.5) }} />)}
+                {/* battery */}
+                <div style={{ width: px(22), height: px(11), border: "1.5px solid rgba(245,245,245,.35)", borderRadius: px(3), marginLeft: px(2), position: "relative", display: "flex", alignItems: "center", padding: "1.5px" }}>
+                    <div style={{ width: "70%", height: "100%", background: "rgba(245,245,245,.35)", borderRadius: px(1.5) }} />
+                    <div style={{ position: "absolute", right: px(-4), top: "50%", transform: "translateY(-50%)", width: px(2.5), height: px(5), background: "rgba(245,245,245,.3)", borderRadius: px(1) }} />
+                </div>
+            </div>
         </div>
+    );
+}
+
+// Toast notification system
+function Toast({ toast }) {
+    if (!toast) return null;
+    const colours = {
+        success: { bg: C.successDim, border: "rgba(34,197,94,.35)",  icon: C.success, left: C.success },
+        warning: { bg: C.warningDim, border: "rgba(245,158,11,.35)", icon: C.warning, left: C.warning },
+        error:   { bg: C.dangerDim,  border: "rgba(239,68,68,.35)",  icon: C.danger,  left: C.danger  },
+        info:    { bg: C.infoDim,    border: "rgba(59,130,246,.35)", icon: C.info,    left: C.info    },
+    };
+    const s = colours[toast.type] || colours.info;
+    return (
+        <div style={{
+            position: "absolute", top: px(60), left: px(16), right: px(16), zIndex: 300,
+            background: C.card1, border: `1px solid ${s.border}`,
+            borderRadius: px(12), padding: "12px 14px",
+            boxShadow: "0 8px 32px rgba(0,0,0,.5)",
+            borderLeft: `3px solid ${s.left}`,
+            display: "flex", alignItems: "center", gap: px(10),
+            animation: "toastIn .3s cubic-bezier(0.16,1,0.3,1) both"
+        }}>
+            <div style={{ width: px(8), height: px(8), borderRadius: "50%", background: s.icon, flexShrink: 0 }} />
+            <span style={{ fontFamily: F.sans, fontSize: px(13), color: C.textPrimary, flex: 1 }}>{toast.msg}</span>
+        </div>
+    );
+}
+
+// Confirmation bottom sheet
+function ConfirmSheet({ sheet, onConfirm, onCancel }) {
+    if (!sheet) return null;
+    return (
+        <div style={{
+            position: "absolute", inset: 0, zIndex: 200,
+            background: "rgba(0,0,0,.7)",
+            display: "flex", flexDirection: "column", justifyContent: "flex-end"
+        }} onClick={onCancel}>
+            <div onClick={e => e.stopPropagation()} style={{
+                background: C.card1, borderRadius: "24px 24px 0 0",
+                padding: "8px 20px 40px",
+                animation: "slideUp .35s cubic-bezier(0.16,1,0.3,1) both"
+            }}>
+                <div style={{ width: px(40), height: px(4), background: C.border, borderRadius: px(2), margin: "8px auto 20px" }} />
+                <div style={{ fontFamily: F.serif, fontWeight: 700, fontSize: px(18), color: C.textPrimary, marginBottom: px(8) }}>{sheet.title}</div>
+                {sheet.body && <div style={{ fontFamily: F.sans, fontSize: px(13), color: C.textSecondary, lineHeight: 1.6, marginBottom: px(20) }}>{sheet.body}</div>}
+                <button onClick={onConfirm} style={{
+                    ...cta(sheet.danger ? C.danger : C.clay, {}),
+                    marginBottom: px(10)
+                }}>{sheet.confirmLabel || "Confirm"}</button>
+                <button onClick={onCancel} style={ghostCta(C.textSecondary, {})}>{sheet.cancelLabel || "Cancel"}</button>
+            </div>
+        </div>
+    );
+}
+
+// Skeleton card loader
+function SkeletonCard({ h = 72, r = 16 }) {
+    return <div className="skel" style={{ height: px(h), borderRadius: px(r), marginBottom: px(10) }} />;
+}
+
+// Primary CTA with loading spinner
+function LoadingCTA({ label, color, onClick, icon, disabled, extra = {} }) {
+    const [loading, setLoading] = useState(false);
+    const handleClick = () => {
+        if (loading || disabled) return;
+        setLoading(true);
+        setTimeout(() => { setLoading(false); if (onClick) onClick(); }, 1400);
+    };
+    return (
+        <button onClick={handleClick} disabled={disabled} style={{
+            ...cta(color || C.clay, extra),
+            opacity: disabled ? 0.5 : 1,
+            cursor: disabled ? "not-allowed" : "pointer"
+        }}>
+            {loading
+                ? <div style={{ width: px(20), height: px(20), border: "2px solid rgba(255,255,255,.25)", borderTop: "2px solid #fff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+                : <>{icon && icon}{label}</>}
+        </button>
     );
 }
 
@@ -220,16 +379,22 @@ function PreLoginHeader({ go, back, step = 1, showBack = false }) {
 
 // Role Dashboard Header Wrapper
 function RoleHeader({ children, role, name, title }) {
-    const rc = roleColor[role];
+    const rc = roleColor[role] || C.clay;
     const rl = roleLabel[role];
     return (
-        <div style={{ padding: "16px", borderBottom: `1px solid ${C.border}` }}>
+        <div style={{ padding: "0 16px 16px", borderBottom: `1px solid ${C.border}` }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
-                    <div style={{ fontFamily: F.sans, fontSize: px(12), color: C.textMuted }}>{title}</div>
-                    <div style={{ fontFamily: F.serif, fontWeight: 700, fontSize: px(18), color: C.textPrimary }}>{name}</div>
+                    <div style={{ fontFamily: F.sans, fontSize: px(11), color: C.textMuted, marginBottom: px(2) }}>{title}</div>
+                    <div style={{ fontFamily: F.serif, fontWeight: 700, fontSize: px(20), color: C.textPrimary, letterSpacing: "-0.3px" }}>{name}</div>
                 </div>
-                <div style={chip(rc + "15", rc, rc + "40")}>
+                <div style={{
+                    background: rc + "18", color: rc,
+                    border: `1px solid ${rc}40`,
+                    fontFamily: F.mono, fontSize: px(10), letterSpacing: "0.5px",
+                    padding: "4px 10px", borderRadius: px(6),
+                    display: "inline-flex", alignItems: "center"
+                }}>
                     {rl}
                 </div>
             </div>
@@ -1773,68 +1938,58 @@ function PaymentSuccess({ go }) {
 }
 
 // Customer Main App Tabs (Home, Schemes, My App, Chat, Profile)
-function CustomerBottomNav({ navTab, onNav }) {
-    const items = [
-        { id: "home", label: "Home", icon: I.home },
-        { id: "schemes", label: "Schemes", icon: I.list },
-        { id: "my_app", label: "My App", icon: I.doc },
-        { id: "chat", label: "Chat", icon: I.chat },
-        { id: "profile", label: "Profile", icon: I.person }
-    ];
+// ─── Shared bottom-nav renderer ───────────────────────────────────────────
+function BottomNav({ items, navTab, onNav, accent }) {
+    const ac = accent || C.clay;
     return (
-        <div
-            style={{
-                position: "absolute",
-                bottom: 0,
-                left: 0,
-                width: "100%",
-                padding: "10px 14px 18px",
-                background: "linear-gradient(transparent,#0B0C0A 45%)"
-            }}
-        >
-            <div
-                style={{
-                    borderRadius: px(24),
-                    background: "rgba(12,15,11,.96)",
-                    border: `1px solid ${C.border}`,
-                    padding: "6px 10px",
-                    display: "flex",
-                    justifyContent: "space-between"
-                }}
-            >
-                {items.map((it) => {
-                    const active = navTab === it.id;
-                    return (
-                        <button
-                            key={it.id}
-                            onClick={() => onNav(it.id)}
-                            style={{
-                                flex: 1,
-                                border: "none",
-                                background: "transparent",
-                                display: "flex",
-                                flexDirection: "column",
-                                alignItems: "center",
-                                gap: px(2),
-                                padding: "4px 0"
-                            }}
-                        >
-                            {it.icon(active ? C.clay : C.textMuted, 18)}
-                            <span
-                                style={{
-                                    fontFamily: F.sans,
-                                    fontSize: px(9),
-                                    color: active ? C.clay : C.textMuted
-                                }}
-                            >
-                                {it.label}
-                            </span>
-                        </button>
-                    );
-                })}
-            </div>
+        <div style={{
+            position: "absolute", bottom: 0, left: 0, width: "100%",
+            height: px(68), zIndex: 100,
+            background: "rgba(15,15,15,0.96)",
+            backdropFilter: "blur(24px)",
+            borderTop: `1px solid ${C.border}`,
+            display: "flex", alignItems: "center"
+        }}>
+            {items.map((it) => {
+                const active = navTab === it.id;
+                return (
+                    <button
+                        key={it.id}
+                        onClick={() => onNav(it.id)}
+                        className="tappable"
+                        style={{
+                            flex: 1, border: "none", background: "transparent",
+                            display: "flex", flexDirection: "column",
+                            alignItems: "center", gap: px(4), padding: "6px 0", cursor: "pointer"
+                        }}
+                    >
+                        <div style={{
+                            width: px(36), height: px(28), borderRadius: px(10),
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            background: active ? ac + "1A" : "transparent",
+                            transition: "all .2s"
+                        }}>
+                            {it.icon(active ? ac : C.textMuted, 20)}
+                        </div>
+                        <span style={{
+                            fontFamily: F.sans, fontWeight: 500, fontSize: px(9),
+                            color: active ? ac : C.textMuted, lineHeight: 1
+                        }}>{it.label}</span>
+                    </button>
+                );
+            })}
         </div>
     );
+}
+
+function CustomerBottomNav({ navTab, onNav }) {
+    return <BottomNav navTab={navTab} onNav={onNav} accent={C.clay} items={[
+        { id: "home",    label: "Home",    icon: I.home   },
+        { id: "schemes", label: "Schemes", icon: I.list   },
+        { id: "my_app",  label: "My App",  icon: I.doc    },
+        { id: "chat",    label: "Chat",    icon: I.chat   },
+        { id: "profile", label: "Profile", icon: I.person }
+    ]} />;
 }
 
 function CustomerHome({ onNav }) {
@@ -2566,7 +2721,7 @@ function CustomerProfile({ onNav }) {
 }
 
 // =========================================================================
-// ROLE 2 - SALES EXECUTIVE APP (Accent: TEAL)
+// ROLE 2 - SALES EXECUTIVE APP (Active nav & CTAs: CLAY per design system)
 // =========================================================================
 
 function SalesExecBottomNav({ navTab, onNav }) {
@@ -2614,12 +2769,24 @@ function SalesExecBottomNav({ navTab, onNav }) {
                                 padding: "4px 0"
                             }}
                         >
-                            {it.icon(active ? C.teal : C.textMuted, 18)}
+                            <div
+                                style={{
+                                    width: px(34),
+                                    height: px(26),
+                                    borderRadius: px(9),
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    background: active ? "rgba(200,75,12,0.11)" : "transparent"
+                                }}
+                            >
+                                {it.icon(active ? C.clay : C.textMuted, 18)}
+                            </div>
                             <span
                                 style={{
-                                    fontFamily: F.sans,
-                                    fontSize: px(9),
-                                    color: active ? C.teal : C.textMuted
+                                    fontFamily: F.mono,
+                                    fontSize: px(8),
+                                    color: active ? C.clay : C.textMuted
                                 }}
                             >
                                 {it.label}
@@ -2636,7 +2803,7 @@ function SalesExecHome({ onNav }) {
     return (
         <div className="sc" style={{ background: C.bg, position: "relative" }}>
             <SB />
-            <div className="hide-scroll" style={{ padding: "10px 16px 90px", overflowY: "auto" }}>
+            <div className="hide-scroll" style={{ padding: "10px 16px 110px", overflowY: "auto", overflowX: "hidden" }}>
                 <RoleHeader role="sales_exec" name="Arjun Singh" title="Good morning 👋">
                     <div
                         style={{
@@ -2644,28 +2811,34 @@ function SalesExecHome({ onNav }) {
                             borderRadius: px(14),
                             border: `1px solid ${C.border}`,
                             background: "linear-gradient(135deg,#12221C,#0F1511)",
-                            padding: "12px 12px 10px"
+                            padding: "12px 12px 10px",
+                            width: "100%",
+                            minWidth: 0
                         }}
                     >
-                        <div style={{ fontFamily: F.mono, fontSize: px(9), color: C.textMuted, letterSpacing: "1.5px" }}>
+                        <div style={{ fontFamily: F.mono, fontSize: px(9), color: C.textMuted, letterSpacing: "1.5px", overflow: "visible", wordBreak: "keep-all" }}>
                             THIS WEEK&apos;S COLLECTION
                         </div>
                         <div
                             style={{
                                 marginTop: px(6),
                                 display: "flex",
+                                flexWrap: "wrap",
                                 alignItems: "baseline",
-                                justifyContent: "space-between"
+                                justifyContent: "space-between",
+                                gap: px(8)
                             }}
                         >
-                            <div style={{ fontFamily: F.serif, fontWeight: 700, fontSize: px(22), color: C.textPrimary }}>
+                            <div style={{ fontFamily: F.serif, fontWeight: 700, fontSize: px(22), color: C.textPrimary, flexShrink: 0 }}>
                                 <AnimatedNumber value="38400" />
                             </div>
                             <div
                                 style={{
                                     ...chip("rgba(245,166,35,.16)", C.amber, "transparent"),
                                     padding: "2px 8px",
-                                    fontSize: px(9)
+                                    fontSize: px(9),
+                                    flexShrink: 0,
+                                    whiteSpace: "nowrap"
                                 }}
                             >
                                 GROWTH PERFORMER · 8%
@@ -2718,9 +2891,9 @@ function SalesExecHome({ onNav }) {
                                             height: px(6),
                                             borderRadius: "50%",
                                             background:
-                                                idx === 1 ? C.teal : "rgba(237,240,232,0.12)",
+                                                idx === 1 ? C.clay : "rgba(237,240,232,0.12)",
                                             boxShadow:
-                                                idx === 1 ? "0 0 0 4px rgba(76,201,160,.16)" : "none"
+                                                idx === 1 ? "0 0 0 4px rgba(200,75,12,.16)" : "none"
                                         }}
                                     />
                                     <span>{row}</span>
@@ -2734,7 +2907,7 @@ function SalesExecHome({ onNav }) {
                     <div style={{ fontFamily: F.mono, fontSize: px(9), color: C.textMuted, letterSpacing: "1.5px", marginBottom: px(6) }}>
                         KPIS
                     </div>
-                    <div style={{ display: "flex", overflowX: "auto", gap: px(8) }}>
+                    <div style={{ display: "flex", overflowX: "auto", gap: px(8), paddingBottom: px(2) }}>
                         {[
                             { label: "My Leads", val: "12" },
                             { label: "Converted", val: "4" },
@@ -2744,7 +2917,8 @@ function SalesExecHome({ onNav }) {
                             <div
                                 key={k.label}
                                 style={{
-                                    minWidth: px(90),
+                                    minWidth: px(98),
+                                    flexShrink: 0,
                                     borderRadius: px(12),
                                     border: `1px solid ${C.border}`,
                                     background: C.card1,
@@ -2752,7 +2926,7 @@ function SalesExecHome({ onNav }) {
                                 }}
                             >
                                 <div style={{ fontFamily: F.mono, fontSize: px(15), color: C.teal }}>{k.val}</div>
-                                <div style={{ fontFamily: F.sans, fontSize: px(11), color: C.textMuted }}>{k.label}</div>
+                                <div style={{ fontFamily: F.sans, fontSize: px(11), color: C.textMuted, whiteSpace: "nowrap", overflow: "visible" }}>{k.label}</div>
                             </div>
                         ))}
                     </div>
@@ -2770,7 +2944,8 @@ function SalesExecHome({ onNav }) {
                                 border: "none",
                                 fontFamily: F.sans,
                                 fontSize: px(11),
-                                color: C.textMuted
+                                color: C.clay,
+                                cursor: "pointer"
                             }}
                         >
                             View All →
@@ -2781,49 +2956,27 @@ function SalesExecHome({ onNav }) {
                             { name: "Ravi Kumar", type: "PM SVANidhi", amt: "₹2,00,000", status: "PENDING" },
                             { name: "Sonal Jain", type: "MUDRA Tarun", amt: "₹7,50,000", status: "APPROVED" },
                             { name: "Amit Traders", type: "CGTMSE", amt: "₹5,00,000", status: "OBJECTION" }
-                        ].map((l) => {
-                            const color =
-                                l.status === "APPROVED"
-                                    ? C.teal
-                                    : l.status === "OBJECTION"
-                                    ? C.red
-                                    : C.amber;
-                            return (
-                                <div
-                                    key={l.name}
-                                    style={{
-                                        borderRadius: px(12),
-                                        border: `1px solid ${C.border}`,
-                                        background: C.card1,
-                                        padding: "10px 12px"
-                                    }}
-                                >
-                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                        <div>
-                                            <div style={{ fontFamily: F.sans, fontSize: px(13), color: C.textPrimary }}>{l.name}</div>
-                                            <div style={{ fontFamily: F.sans, fontSize: px(11), color: C.textMuted }}>{l.type}</div>
-                                        </div>
-                                        <div style={{ textAlign: "right" }}>
-                                            <div style={{ fontFamily: F.mono, fontSize: px(12), color: C.teal }}>{l.amt}</div>
-                                            <div
-                                                style={{
-                                                    ...chip(color + "1A", color, "transparent"),
-                                                    padding: "2px 8px",
-                                                    fontSize: px(9),
-                                                    marginTop: px(4)
-                                                }}
-                                            >
-                                                {l.status}
-                                            </div>
-                                        </div>
+                        ].map((l) => (
+                            <div key={l.name} className="tappable" style={{
+                                borderRadius: px(14), border: `1px solid ${C.border}`,
+                                background: C.card1, padding: "12px 14px"
+                            }}>
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                    <div>
+                                        <div style={{ fontFamily: F.sans, fontWeight: 600, fontSize: px(13), color: C.textPrimary }}>{l.name}</div>
+                                        <div style={{ fontFamily: F.sans, fontSize: px(11), color: C.textMuted, marginTop: px(2) }}>{l.type}</div>
+                                    </div>
+                                    <div style={{ textAlign: "right" }}>
+                                        <div style={{ fontFamily: F.mono, fontSize: px(12), color: C.textPrimary, marginBottom: px(4) }}>{l.amt}</div>
+                                        <div style={statusChip(l.status)}>{l.status}</div>
                                     </div>
                                 </div>
-                            );
-                        })}
+                            </div>
+                        ))}
                     </div>
                 </div>
 
-                <div style={{ marginTop: px(16), marginBottom: px(8) }}>
+                <div style={{ marginTop: px(16), marginBottom: px(24) }}>
                     <div style={{ fontFamily: F.mono, fontSize: px(9), color: C.textMuted, letterSpacing: "1.5px", marginBottom: px(6) }}>
                         OBJECTION ALERTS
                     </div>
@@ -2832,7 +2985,8 @@ function SalesExecHome({ onNav }) {
                             borderRadius: px(12),
                             border: `1px solid rgba(224,82,82,.7)`,
                             background: "rgba(224,82,82,.08)",
-                            padding: "10px 12px"
+                            padding: "10px 12px",
+                            overflow: "visible"
                         }}
                     >
                         <div style={{ fontFamily: F.sans, fontSize: px(12), color: C.textPrimary }}>
@@ -2844,12 +2998,12 @@ function SalesExecHome({ onNav }) {
                         <button
                             style={{
                                 marginTop: px(8),
-                                ...cta(C.teal, {
+                                ...cta(C.clay, {
                                     width: "auto",
                                     height: px(32),
                                     padding: "0 12px",
                                     fontSize: px(11),
-                                    boxShadow: "none"
+                                    boxShadow: "0 4px 18px rgba(200,75,12,0.32)"
                                 })
                             }}
                         >
@@ -2864,145 +3018,86 @@ function SalesExecHome({ onNav }) {
 }
 
 function SalesExecLeads({ onNav }) {
+    const [loading, setLoading] = useState(true);
+    useEffect(() => { const t = setTimeout(() => setLoading(false), 600); return () => clearTimeout(t); }, []);
     return (
         <div className="sc" style={{ background: C.bg, position: "relative" }}>
             <SB />
-            <div
-                style={{
-                    padding: "8px 16px 10px",
-                    borderBottom: `1px solid ${C.border}`,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between"
-                }}
-            >
+            <div style={{
+                padding: "14px 16px",
+                borderBottom: `1px solid ${C.border}`,
+                display: "flex", alignItems: "center", justifyContent: "space-between"
+            }}>
                 <div>
-                    <div style={{ fontFamily: F.serif, fontWeight: 700, fontSize: px(18), color: C.textPrimary }}>My Leads</div>
-                    <div style={{ fontFamily: F.sans, fontSize: px(11), color: C.textMuted }}>Track and create new loan leads</div>
+                    <div style={{ fontFamily: F.serif, fontWeight: 700, fontSize: px(20), color: C.textPrimary, letterSpacing: "-0.3px" }}>My Leads</div>
+                    <div style={{ fontFamily: F.sans, fontSize: px(11), color: C.textMuted, marginTop: px(2) }}>Track and create loan leads</div>
                 </div>
                 <button
                     onClick={() => onNav("se_new_lead")}
-                    style={{
-                        ...cta(C.teal, {
-                            width: "auto",
-                            height: px(32),
-                            padding: "0 12px",
-                            fontSize: px(11),
-                            boxShadow: "none"
-                        })
-                    }}
+                    style={{ ...cta(C.clay, { width: "auto", height: px(36), padding: "0 14px", fontSize: px(12) }) }}
                 >
                     {I.plus("#fff", 14)} New Lead
                 </button>
             </div>
 
             <div className="hide-scroll" style={{ padding: "12px 16px 90px", overflowY: "auto" }}>
-                <div
-                    style={{
-                        height: px(38),
-                        borderRadius: px(12),
-                        border: `1px solid ${C.border}`,
-                        background: C.card1,
-                        padding: "0 10px",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: px(8),
-                        marginBottom: px(10)
-                    }}
-                >
+                <div style={{
+                    height: px(44), borderRadius: px(12), border: `1px solid ${C.border}`,
+                    background: C.card1, padding: "0 14px", display: "flex", alignItems: "center", gap: px(8), marginBottom: px(12)
+                }}>
                     {I.search(C.textMuted, 16)}
                     <span style={{ fontFamily: F.sans, fontSize: px(13), color: C.textMuted }}>Search by name, scheme, amount…</span>
                 </div>
-                <div style={{ display: "flex", gap: px(8), marginBottom: px(12) }}>
+                <div style={{ display: "flex", gap: px(6), marginBottom: px(14), overflowX: "auto" }}>
                     {["All", "Pending", "Approved", "Objection", "Rejected"].map((f, idx) => (
-                        <button
-                            key={f}
-                            style={{
-                                padding: "6px 10px",
-                                borderRadius: px(999),
-                                border: `1px solid ${idx === 0 ? C.teal : C.border}`,
-                                background: idx === 0 ? "rgba(76,201,160,.15)" : C.card1,
-                                fontFamily: F.sans,
-                                fontSize: px(11),
-                                color: idx === 0 ? C.teal : C.textPrimary
-                            }}
-                        >
-                            {f}
-                        </button>
+                        <button key={f} className="tappable" style={{
+                            padding: "6px 12px", borderRadius: px(20), whiteSpace: "nowrap",
+                            border: `1px solid ${idx === 0 ? roleColor.sales_exec : C.border}`,
+                            background: idx === 0 ? "rgba(34,197,94,0.12)" : C.card1,
+                            fontFamily: F.sans, fontWeight: 500, fontSize: px(11),
+                            color: idx === 0 ? roleColor.sales_exec : C.textSecondary,
+                            cursor: "pointer"
+                        }}>{f}</button>
                     ))}
                 </div>
 
-                <div style={{ display: "flex", flexDirection: "column", gap: px(8) }}>
+                {loading
+                    ? [1,2,3].map(i => <SkeletonCard key={i} h={80} />)
+                    : <div style={{ display: "flex", flexDirection: "column", gap: px(0) }}>
                     {[
                         { name: "Ravi Kumar", scheme: "PM SVANidhi", amt: "₹2,00,000", status: "PENDING", updated: "Today 2:30 PM" },
                         { name: "Sonal Jain", scheme: "MUDRA Tarun", amt: "₹7,50,000", status: "APPROVED", updated: "Yesterday 5:10 PM" },
                         { name: "Amit Traders", scheme: "CGTMSE", amt: "₹5,00,000", status: "OBJECTION", updated: "Today 11:05 AM" }
                     ].map((l) => {
-                        const color =
-                            l.status === "APPROVED"
-                                ? C.teal
-                                : l.status === "OBJECTION"
-                                ? C.red
-                                : l.status === "REJECTED"
-                                ? C.red
-                                : C.amber;
                         return (
-                            <div
-                                key={l.name}
-                                style={{
-                                    borderRadius: px(12),
-                                    border: `1px solid ${C.border}`,
-                                    background: C.card1,
-                                    padding: "10px 12px"
-                                }}
-                            >
+                            <div key={l.name} className="tappable" style={{
+                                borderRadius: px(14), border: `1px solid ${C.border}`,
+                                background: C.card1, padding: "12px 14px", marginBottom: px(8)
+                            }}>
                                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                                    <div style={{ display: "flex", alignItems: "center", gap: px(8) }}>
-                                        <div
-                                            style={{
-                                                width: px(26),
-                                                height: px(26),
-                                                borderRadius: "50%",
-                                                background: C.card2,
-                                                display: "flex",
-                                                alignItems: "center",
-                                                justifyContent: "center",
-                                                fontFamily: F.sans,
-                                                fontSize: px(11),
-                                                color: C.textPrimary
-                                            }}
-                                        >
-                                            {l.name
-                                                .split(" ")
-                                                .map((x) => x[0])
-                                                .join("")}
+                                    <div style={{ display: "flex", alignItems: "center", gap: px(10) }}>
+                                        <div style={{
+                                            width: px(36), height: px(36), borderRadius: "50%",
+                                            background: "rgba(34,197,94,0.10)", border: "1px solid rgba(34,197,94,0.25)",
+                                            display: "flex", alignItems: "center", justifyContent: "center",
+                                            fontFamily: F.serif, fontWeight: 700, fontSize: px(13), color: roleColor.sales_exec
+                                        }}>
+                                            {l.name.split(" ").map((x) => x[0]).join("")}
                                         </div>
                                         <div>
-                                            <div style={{ fontFamily: F.sans, fontSize: px(13), color: C.textPrimary }}>{l.name}</div>
-                                            <div style={{ fontFamily: F.sans, fontSize: px(11), color: C.textMuted }}>{l.scheme}</div>
+                                            <div style={{ fontFamily: F.sans, fontWeight: 600, fontSize: px(13), color: C.textPrimary }}>{l.name}</div>
+                                            <div style={{ fontFamily: F.sans, fontSize: px(11), color: C.textMuted, marginTop: px(2) }}>{l.scheme} · {l.amt}</div>
                                         </div>
                                     </div>
-                                    <div style={{ textAlign: "right" }}>
-                                        <div style={{ fontFamily: F.mono, fontSize: px(12), color: C.teal }}>{l.amt}</div>
-                                        <div
-                                            style={{
-                                                ...chip(color + "1A", color, "transparent"),
-                                                padding: "2px 8px",
-                                                fontSize: px(9),
-                                                marginTop: px(4)
-                                            }}
-                                        >
-                                            {l.status}
-                                        </div>
-                                    </div>
+                                    <div style={statusChip(l.status)}>{l.status}</div>
                                 </div>
-                                <div style={{ fontFamily: F.sans, fontSize: px(11), color: C.textMuted, marginTop: px(4) }}>
-                                    Last updated: {l.updated}
+                                <div style={{ fontFamily: F.mono, fontSize: px(10), color: C.textMuted, marginTop: px(8) }}>
+                                    Updated: {l.updated}
                                 </div>
                             </div>
                         );
                     })}
-                </div>
+                </div>}
             </div>
             <SalesExecBottomNav navTab="se_leads" onNav={onNav} />
         </div>
@@ -3402,81 +3497,98 @@ function SalesExecProfile({ onNav }) {
 // =========================================================================
 
 function TLBottomNav({ navTab, onNav }) {
-    const items = [
-        { id: "tl_home", label: "Home", icon: I.home },
-        { id: "tl_team", label: "Team", icon: I.users },
-        { id: "tl_leads", label: "Leads", icon: I.list },
+    return <BottomNav navTab={navTab} onNav={onNav} accent={C.amber} items={[
+        { id: "tl_home",    label: "Home",    icon: I.home   },
+        { id: "tl_team",    label: "Team",    icon: I.users  },
+        { id: "tl_leads",   label: "Leads",   icon: I.list   },
         { id: "tl_profile", label: "Profile", icon: I.person }
-    ];
-    return (
-        <div style={{ position: "absolute", bottom: 0, left: 0, width: "100%", padding: "10px 14px 18px", background: "linear-gradient(transparent,#0B0C0A 45%)" }}>
-            <div style={{ borderRadius: px(24), background: "rgba(12,15,11,.96)", border: `1px solid ${C.border}`, padding: "6px 10px", display: "flex", justifyContent: "space-between" }}>
-                {items.map((it) => {
-                    const active = navTab === it.id;
-                    return (
-                        <button key={it.id} onClick={() => onNav(it.id)} style={{ flex: 1, border: "none", background: "transparent", display: "flex", flexDirection: "column", alignItems: "center", gap: px(2), padding: "4px 0" }}>
-                            {it.icon(active ? C.amber : C.textMuted, 18)}
-                            <span style={{ fontFamily: F.sans, fontSize: px(9), color: active ? C.amber : C.textMuted }}>{it.label}</span>
-                        </button>
-                    );
-                })}
-            </div>
-        </div>
-    );
+    ]} />;
 }
 
 function TLHome({ onNav }) {
+    const members = [
+        { name: "Arjun Singh", leads: 12, amt: "₹62,400", slab: "High", pct: 83 },
+        { name: "Ramesh K.",   leads: 8,  amt: "₹38,200", slab: "Growth", pct: 51 },
+        { name: "Nitu Sharma", leads: 6,  amt: "₹24,800", slab: "Starter", pct: 33 },
+    ];
     return (
         <div className="sc" style={{ background: C.bg, position: "relative" }}>
             <SB />
-            <div className="hide-scroll" style={{ padding: "10px 16px 90px", overflowY: "auto" }}>
-                <RoleHeader role="team_leader" name="Priya Menon" title="Team Leader">
-                    <div style={{ marginTop: px(12), borderRadius: px(14), border: `1px solid ${C.border}`, background: "linear-gradient(135deg,#1F1A0F,#111510)", padding: "12px 12px 10px" }}>
-                        <div style={{ fontFamily: F.mono, fontSize: px(9), color: C.textMuted, letterSpacing: "1.5px" }}>TEAM WEEKLY COLLECTION</div>
-                        <div style={{ marginTop: px(6), display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
-                            <div style={{ fontFamily: F.serif, fontWeight: 700, fontSize: px(22), color: C.textPrimary }}><AnimatedNumber value="184200" /></div>
-                            <div style={{ fontFamily: F.sans, fontSize: px(11), color: C.textMuted }}>Target: ₹2,50,000</div>
+            <div className="hide-scroll" style={{ padding: "10px 16px 110px", overflowY: "auto", overflowX: "hidden" }}>
+                <RoleHeader role="team_leader" name="Priya Menon" title="Good afternoon 👋">
+                    {/* Team target card */}
+                    <div style={{ marginTop: px(12), borderRadius: px(14), border: `1px solid rgba(245,158,11,0.25)`, background: "linear-gradient(135deg,rgba(245,158,11,0.08),rgba(245,158,11,0.02))", padding: "14px" }}>
+                        <div style={{ fontFamily: F.mono, fontSize: px(9), color: C.textMuted, letterSpacing: "1.5px", marginBottom: px(8) }}>TEAM WEEKLY COLLECTION</div>
+                        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: px(8), flexWrap: "wrap" }}>
+                            <div style={{ fontFamily: F.serif, fontWeight: 900, fontSize: px(28), color: C.textPrimary, letterSpacing: "-0.5px" }}>
+                                <AnimatedNumber value="184200" />
+                            </div>
+                            <div style={{ fontFamily: F.mono, fontSize: px(11), color: C.amber }}>73.6% of target</div>
                         </div>
-                        <div style={{ marginTop: px(8), height: px(6), borderRadius: px(999), background: "#171B16", overflow: "hidden" }}>
-                            <div style={{ width: "73.6%", height: "100%", background: "linear-gradient(90deg,#C84B0C,#F5A623)", borderRadius: px(999) }} />
+                        <div style={{ marginTop: px(10), height: px(6), borderRadius: px(3), background: C.card2, overflow: "hidden" }}>
+                            <div style={{ width: "73.6%", height: "100%", background: "linear-gradient(90deg,#F59E0B,#FBBF24)", borderRadius: px(3), animation: "progressFill 0.8s ease-out both" }} />
                         </div>
-                        <div style={{ fontFamily: F.sans, fontSize: px(11), color: C.textMuted, marginTop: px(6) }}>₹65,800 more to unlock 1% incentive (₹2,500)</div>
+                        <div style={{ marginTop: px(6), fontFamily: F.sans, fontSize: px(11), color: C.textSecondary }}>
+                            ₹65,800 more to unlock 1% incentive (est. <span style={{ color: C.amber }}>₹2,500</span>)
+                        </div>
+                        <div style={{ marginTop: px(10), fontFamily: F.mono, fontSize: px(10), color: C.textMuted }}>
+                            Target: ₹2,50,000 · Closes Saturday
+                        </div>
                     </div>
                 </RoleHeader>
-                <div style={{ marginTop: px(16), display: "flex", overflowX: "auto", gap: px(8) }}>
-                    {[{ label: "Team Size", val: "8" }, { label: "Total Leads", val: "64" }, { label: "Converted", val: "22" }, { label: "Pending", val: "31" }, { label: "Objections", val: "4" }].map((k) => (
-                        <div key={k.label} style={{ minWidth: px(72), borderRadius: px(12), border: `1px solid ${C.border}`, background: C.card1, padding: "8px 10px" }}>
-                            <div style={{ fontFamily: F.mono, fontSize: px(14), color: C.amber }}>{k.val}</div>
-                            <div style={{ fontFamily: F.sans, fontSize: px(10), color: C.textMuted }}>{k.label}</div>
+
+                {/* KPI strip */}
+                <div style={{ marginTop: px(16), display: "flex", overflowX: "auto", gap: px(8), paddingRight: px(4) }}>
+                    {[{ label: "Team Size", val: "8" }, { label: "Total Leads", val: "64" }, { label: "Converted", val: "22" }, { label: "Pending", val: "31" }, { label: "Objections", val: "4" }].map((k, i) => (
+                        <div key={k.label} className="tappable" style={{
+                            minWidth: px(80), flexShrink: 0,
+                            borderRadius: px(12), border: `1px solid ${C.border}`, background: C.card1, padding: "10px 10px"
+                        }}>
+                            <div style={{ fontFamily: F.mono, fontSize: px(16), color: C.amber, fontWeight: 700 }}>{k.val}</div>
+                            <div style={{ fontFamily: F.sans, fontSize: px(10), color: C.textMuted, marginTop: px(2), whiteSpace: "nowrap" }}>{k.label}</div>
                         </div>
                     ))}
                 </div>
-                <div style={{ marginTop: px(16) }}>
-                    <div style={{ fontFamily: F.mono, fontSize: px(9), color: C.textMuted, letterSpacing: "1.5px", marginBottom: px(8) }}>TEAM PERFORMANCE</div>
-                    <div style={{ borderRadius: px(12), border: `1.5px solid ${C.amber}`, background: "rgba(245,166,35,.06)", padding: "10px 12px", marginBottom: px(8) }}>
-                        <div style={{ fontFamily: F.sans, fontWeight: 600, fontSize: px(13), color: C.textPrimary }}>Best Performer: Arjun Singh — ₹62,400 🏆</div>
+
+                {/* Team performance */}
+                <div style={{ marginTop: px(18) }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: px(10) }}>
+                        <div style={{ fontFamily: F.sans, fontWeight: 700, fontSize: px(14), color: C.textPrimary }}>Team Performance</div>
+                        <button onClick={() => onNav("tl_team")} style={{ background: "none", border: "none", fontFamily: F.sans, fontWeight: 600, fontSize: px(12), color: C.amber, cursor: "pointer" }}>View All →</button>
                     </div>
-                    {[{ name: "Arjun Singh", leads: 12, amt: "₹62,400", slab: "High" }, { name: "Ramesh K.", leads: 8, amt: "₹38,200", slab: "Growth" }].map((m) => (
-                        <div key={m.name} style={{ borderRadius: px(12), border: `1px solid ${C.border}`, background: C.card1, padding: "10px 12px", marginBottom: px(8) }}>
+                    {/* Best performer highlight */}
+                    <div style={{ borderRadius: px(14), border: `1.5px solid rgba(245,158,11,0.3)`, background: "linear-gradient(135deg,rgba(245,158,11,0.08),rgba(245,158,11,0.02))", padding: "12px 14px", marginBottom: px(10) }}>
+                        <div style={{ fontFamily: F.mono, fontSize: px(9), color: C.amber, letterSpacing: "1px", marginBottom: px(4) }}>🏆 BEST PERFORMER THIS WEEK</div>
+                        <div style={{ fontFamily: F.serif, fontWeight: 700, fontSize: px(16), color: C.textPrimary }}>Arjun Singh</div>
+                        <div style={{ fontFamily: F.sans, fontSize: px(12), color: C.textSecondary, marginTop: px(2) }}>₹62,400 · 12 leads · High slab</div>
+                    </div>
+                    {members.map((m) => (
+                        <div key={m.name} className="tappable" style={{ borderRadius: px(14), border: `1px solid ${C.border}`, background: C.card1, padding: "12px 14px", marginBottom: px(8) }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                <div style={{ display: "flex", alignItems: "center", gap: px(8) }}>
-                                    <div style={{ width: px(28), height: px(28), borderRadius: "50%", background: C.card2, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: F.sans, fontSize: px(10), color: C.textPrimary }}>{m.name.split(" ").map((x) => x[0]).join("")}</div>
+                                <div style={{ display: "flex", alignItems: "center", gap: px(10) }}>
+                                    <div style={{ width: px(36), height: px(36), borderRadius: "50%", background: "rgba(245,158,11,0.12)", border: "1px solid rgba(245,158,11,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: F.serif, fontWeight: 700, fontSize: px(13), color: C.amber }}>
+                                        {m.name.split(" ").map((x) => x[0]).join("")}
+                                    </div>
                                     <div>
-                                        <div style={{ fontFamily: F.sans, fontSize: px(13), color: C.textPrimary }}>{m.name}</div>
-                                        <div style={{ fontFamily: F.sans, fontSize: px(11), color: C.textMuted }}>{m.leads} leads · {m.amt}</div>
+                                        <div style={{ fontFamily: F.sans, fontWeight: 600, fontSize: px(13), color: C.textPrimary }}>{m.name}</div>
+                                        <div style={{ fontFamily: F.sans, fontSize: px(11), color: C.textMuted, marginTop: px(2) }}>{m.leads} leads · {m.amt}</div>
                                     </div>
                                 </div>
-                                <div style={{ ...chip("rgba(245,166,35,.16)", C.amber, "transparent"), padding: "2px 8px", fontSize: px(9) }}>{m.slab}</div>
+                                <div style={{ ...chip("rgba(245,158,11,0.12)", C.amber, "rgba(245,158,11,0.25)"), fontSize: px(9) }}>{m.slab}</div>
+                            </div>
+                            {/* mini progress */}
+                            <div style={{ marginTop: px(10), height: px(4), borderRadius: px(2), background: C.card2 }}>
+                                <div style={{ width: `${m.pct}%`, height: "100%", background: "linear-gradient(90deg,#F59E0B,#FBBF24)", borderRadius: px(2) }} />
                             </div>
                         </div>
                     ))}
                 </div>
-                <div style={{ marginTop: px(16), borderRadius: px(12), border: `1px solid rgba(224,82,82,.5)`, background: "rgba(224,82,82,.08)", padding: "10px 12px" }}>
-                    <div style={{ fontFamily: F.sans, fontSize: px(12), color: C.textPrimary }}>⚠️ Escalation: 2 cases need TL attention</div>
-                    <div style={{ display: "flex", gap: px(8), marginTop: px(8) }}>
-                        <button style={{ ...cta(C.teal, { width: "auto", height: px(32), padding: "0 12px", fontSize: px(11) }) }}>Resolve</button>
-                        <button style={{ ...ghostCta(C.red, { width: "auto", height: px(32), padding: "0 12px", fontSize: px(11) }) }}>Escalate to Admin</button>
-                    </div>
+
+                {/* Escalation card */}
+                <div style={{ marginTop: px(4), marginBottom: px(24), borderRadius: px(14), border: `1px solid rgba(239,68,68,0.25)`, background: C.dangerDim, padding: "12px 14px" }}>
+                    <div style={{ fontFamily: F.sans, fontWeight: 600, fontSize: px(13), color: C.textPrimary }}>⚠️ 2 cases need your attention</div>
+                    <div style={{ fontFamily: F.sans, fontSize: px(12), color: C.textSecondary, marginTop: px(4) }}>Objections raised by bank — review before Friday</div>
+                    <button onClick={() => onNav("tl_leads")} style={{ marginTop: px(10), ...cta(C.danger, { height: px(36), fontSize: px(12) }) }}>Review Cases →</button>
                 </div>
             </div>
             <TLBottomNav navTab="tl_home" onNav={onNav} />
@@ -3485,25 +3597,36 @@ function TLHome({ onNav }) {
 }
 
 function TLTeam({ onNav }) {
+    const [loading, setLoading] = useState(true);
+    useEffect(() => { const t = setTimeout(() => setLoading(false), 600); return () => clearTimeout(t); }, []);
+    const members = [
+        { name: "Arjun Singh", id: "SE-CH-014", leads: 12, amt: "₹62,400", status: "Active" },
+        { name: "Ramesh K.",   id: "SE-CH-022", leads: 8,  amt: "₹38,200", status: "Active" },
+        { name: "Nitu Sharma", id: "SE-CH-031", leads: 6,  amt: "₹24,800", status: "Active" },
+        { name: "Dev Patel",   id: "SE-CH-041", leads: 3,  amt: "₹11,200", status: "Inactive" },
+    ];
     return (
         <div className="sc" style={{ background: C.bg, position: "relative" }}>
             <SB />
-            <div style={{ padding: "8px 16px 10px", borderBottom: `1px solid ${C.border}` }}>
-                <div style={{ fontFamily: F.serif, fontWeight: 700, fontSize: px(18), color: C.textPrimary }}>Team</div>
-                <div style={{ fontFamily: F.sans, fontSize: px(11), color: C.textMuted }}>8 members · 3 Team Leaders, 5 Sales Execs</div>
+            <div style={{ padding: "14px 16px", borderBottom: `1px solid ${C.border}` }}>
+                <div style={{ fontFamily: F.serif, fontWeight: 700, fontSize: px(20), color: C.textPrimary, letterSpacing: "-0.3px" }}>My Team</div>
+                <div style={{ fontFamily: F.sans, fontSize: px(11), color: C.textMuted, marginTop: px(2) }}>4 members · {members.filter(m => m.status === "Active").length} Active</div>
             </div>
             <div className="hide-scroll" style={{ padding: "12px 16px 90px", overflowY: "auto" }}>
-                {[{ name: "Arjun Singh", id: "SE-CH-014", leads: 12, status: "Active" }, { name: "Ramesh K.", id: "SE-CH-022", leads: 8, status: "Active" }].map((m) => (
-                    <div key={m.name} style={{ borderRadius: px(12), border: `1px solid ${C.border}`, background: C.card1, padding: "10px 12px", marginBottom: px(8) }}>
+                {loading ? [1,2,3].map(i => <SkeletonCard key={i} h={72} />) :
+                members.map((m) => (
+                    <div key={m.name} className="tappable" style={{ borderRadius: px(14), border: `1px solid ${C.border}`, background: C.card1, padding: "12px 14px", marginBottom: px(8) }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: px(8) }}>
-                                <div style={{ width: px(36), height: px(36), borderRadius: "50%", background: C.card2, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: F.sans, fontSize: px(12), color: C.textPrimary }}>{m.name.split(" ").map((x) => x[0]).join("")}</div>
+                            <div style={{ display: "flex", alignItems: "center", gap: px(10) }}>
+                                <div style={{ width: px(40), height: px(40), borderRadius: "50%", background: "rgba(245,158,11,0.12)", border: "1px solid rgba(245,158,11,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: F.serif, fontWeight: 700, fontSize: px(14), color: C.amber }}>
+                                    {m.name.split(" ").map((x) => x[0]).join("")}
+                                </div>
                                 <div>
-                                    <div style={{ fontFamily: F.sans, fontSize: px(13), color: C.textPrimary }}>{m.name}</div>
-                                    <div style={{ fontFamily: F.sans, fontSize: px(11), color: C.textMuted }}>{m.id} · {m.leads} leads</div>
+                                    <div style={{ fontFamily: F.sans, fontWeight: 600, fontSize: px(13), color: C.textPrimary }}>{m.name}</div>
+                                    <div style={{ fontFamily: F.sans, fontSize: px(11), color: C.textMuted, marginTop: px(2) }}>{m.id} · {m.leads} leads · {m.amt}</div>
                                 </div>
                             </div>
-                            <div style={{ ...chip(m.status === "Active" ? "rgba(76,201,160,.18)" : C.card2, m.status === "Active" ? C.teal : C.textMuted, "transparent"), padding: "2px 8px", fontSize: px(9) }}>{m.status}</div>
+                            <div style={statusChip(m.status === "Active" ? "ACTIVE" : "INACTIVE")}>{m.status}</div>
                         </div>
                     </div>
                 ))}
@@ -3514,26 +3637,35 @@ function TLTeam({ onNav }) {
 }
 
 function TLLeads({ onNav }) {
+    const [loading, setLoading] = useState(true);
+    useEffect(() => { const t = setTimeout(() => setLoading(false), 600); return () => clearTimeout(t); }, []);
+    const leads = [
+        { name: "Ravi Kumar",    scheme: "PM SVANidhi",  amt: "₹2,00,000", status: "PENDING",   assigned: "Arjun Singh" },
+        { name: "Sonal Jain",   scheme: "MUDRA Tarun",  amt: "₹7,50,000", status: "OBJECTION", assigned: "Ramesh K."  },
+        { name: "Meena Devi",   scheme: "CGTMSE",       amt: "₹3,00,000", status: "APPROVED",  assigned: "Nitu Sharma"},
+    ];
     return (
         <div className="sc" style={{ background: C.bg, position: "relative" }}>
             <SB />
-            <div style={{ padding: "8px 16px 10px", borderBottom: `1px solid ${C.border}` }}>
-                <div style={{ fontFamily: F.serif, fontWeight: 700, fontSize: px(18), color: C.textPrimary }}>All Team Leads</div>
-                <div style={{ fontFamily: F.sans, fontSize: px(11), color: C.textMuted }}>Filter by member, status, scheme</div>
+            <div style={{ padding: "14px 16px", borderBottom: `1px solid ${C.border}` }}>
+                <div style={{ fontFamily: F.serif, fontWeight: 700, fontSize: px(20), color: C.textPrimary, letterSpacing: "-0.3px" }}>All Team Leads</div>
+                <div style={{ fontFamily: F.sans, fontSize: px(11), color: C.textMuted, marginTop: px(2) }}>Review, approve, escalate</div>
             </div>
             <div className="hide-scroll" style={{ padding: "12px 16px 90px", overflowY: "auto" }}>
-                {[{ name: "Ravi Kumar", scheme: "PM SVANidhi", amt: "₹2L", status: "PENDING", assigned: "Arjun Singh" }].map((l) => (
-                    <div key={l.name} style={{ borderRadius: px(12), border: `1px solid ${C.border}`, background: C.card1, padding: "10px 12px", marginBottom: px(8) }}>
-                        <div style={{ display: "flex", justifyContent: "space-between" }}>
+                {loading ? [1,2,3].map(i => <SkeletonCard key={i} h={88} />) :
+                leads.map((l) => (
+                    <div key={l.name} className="tappable" style={{ borderRadius: px(14), border: `1px solid ${C.border}`, background: C.card1, padding: "12px 14px", marginBottom: px(8) }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                             <div>
-                                <div style={{ fontFamily: F.sans, fontSize: px(13), color: C.textPrimary }}>{l.name}</div>
-                                <div style={{ fontFamily: F.sans, fontSize: px(11), color: C.textMuted }}>Assigned to: {l.assigned}</div>
+                                <div style={{ fontFamily: F.sans, fontWeight: 600, fontSize: px(13), color: C.textPrimary }}>{l.name}</div>
+                                <div style={{ fontFamily: F.sans, fontSize: px(11), color: C.textMuted, marginTop: px(2) }}>{l.scheme} · {l.amt}</div>
+                                <div style={{ fontFamily: F.sans, fontSize: px(11), color: C.textMuted, marginTop: px(2) }}>By: {l.assigned}</div>
                             </div>
-                            <div style={{ ...chip(C.amber + "1A", C.amber, "transparent"), padding: "2px 8px", fontSize: px(9) }}>{l.status}</div>
+                            <div style={statusChip(l.status)}>{l.status}</div>
                         </div>
-                        <div style={{ marginTop: px(6), display: "flex", gap: px(8) }}>
-                            <button style={{ ...cta(C.teal, { width: "auto", height: px(30), padding: "0 10px", fontSize: px(10) }) }}>Approve Pre-Verification</button>
-                            <button style={{ ...ghostCta(C.red, { width: "auto", height: px(30), padding: "0 10px", fontSize: px(10) }) }}>Escalate to Admin</button>
+                        <div style={{ marginTop: px(10), display: "flex", gap: px(8) }}>
+                            <button className="tappable" style={{ ...cta(C.success, { width: "auto", height: px(32), padding: "0 12px", fontSize: px(11) }) }}>Approve</button>
+                            <button className="tappable" style={{ ...ghostCta(C.danger, { width: "auto", height: px(32), padding: "0 12px", fontSize: px(11), border: `1px solid rgba(239,68,68,0.3)` }) }}>Escalate</button>
                         </div>
                     </div>
                 ))}
@@ -3572,64 +3704,91 @@ function TLProfile({ onNav }) {
 // =========================================================================
 
 function FRBottomNav({ navTab, onNav }) {
-    const items = [
-        { id: "fr_home", label: "Home", icon: I.home },
-        { id: "fr_team", label: "Team", icon: I.users },
-        { id: "fr_applications", label: "Applications", icon: I.list },
-        { id: "fr_finance", label: "Finance", icon: I.chart },
-        { id: "fr_profile", label: "Profile", icon: I.person }
-    ];
-    return (
-        <div style={{ position: "absolute", bottom: 0, left: 0, width: "100%", padding: "10px 14px 18px", background: "linear-gradient(transparent,#0B0C0A 45%)" }}>
-            <div style={{ borderRadius: px(24), background: "rgba(12,15,11,.96)", border: `1px solid ${C.border}`, padding: "6px 10px", display: "flex", justifyContent: "space-between" }}>
-                {items.map((it) => {
-                    const active = navTab === it.id;
-                    return (
-                        <button key={it.id} onClick={() => onNav(it.id)} style={{ flex: 1, border: "none", background: "transparent", display: "flex", flexDirection: "column", alignItems: "center", gap: px(2), padding: "4px 0" }}>
-                            {it.icon(active ? C.purple : C.textMuted, 18)}
-                            <span style={{ fontFamily: F.sans, fontSize: px(9), color: active ? C.purple : C.textMuted }}>{it.label}</span>
-                        </button>
-                    );
-                })}
-            </div>
-        </div>
-    );
+    return <BottomNav navTab={navTab} onNav={onNav} accent={C.purple} items={[
+        { id: "fr_home",         label: "Home",    icon: I.home   },
+        { id: "fr_team",         label: "Team",    icon: I.users  },
+        { id: "fr_applications", label: "Apps",    icon: I.list   },
+        { id: "fr_finance",      label: "Finance", icon: I.chart  },
+        { id: "fr_profile",      label: "Profile", icon: I.person }
+    ]} />;
 }
 
 function FRHome({ onNav }) {
+    const bars = [
+        { label: "MUDRA Tarun", h: 70, val: "₹2.1Cr", color: C.clay },
+        { label: "PM SVANidhi", h: 45, val: "₹78L",  color: C.success },
+        { label: "CGTMSE",      h: 32, val: "₹55L",  color: C.amber },
+        { label: "Others",      h: 18, val: "₹26L",  color: C.card2 },
+    ];
     return (
         <div className="sc" style={{ background: C.bg, position: "relative" }}>
             <SB />
-            <div className="hide-scroll" style={{ padding: "10px 16px 90px", overflowY: "auto" }}>
-                <RoleHeader role="franchisee" name="Chennai Franchise — Suresh Iyer" title="Franchise ID: FR-TN-0024">
-                    <div style={{ marginTop: px(12), borderRadius: px(14), border: `1px solid ${C.border}`, background: "linear-gradient(135deg,#1E1825,#111510)", padding: "12px 12px 10px" }}>
-                        <div style={{ fontFamily: F.mono, fontSize: px(9), color: C.textMuted, letterSpacing: "1.5px" }}>THIS MONTH REVENUE</div>
-                        <div style={{ marginTop: px(6), fontFamily: F.serif, fontWeight: 700, fontSize: px(22), color: C.textPrimary }}><AnimatedNumber value="482000" /></div>
-                        <div style={{ marginTop: px(6), display: "flex", justifyContent: "space-between", fontFamily: F.sans, fontSize: px(11), color: C.textMuted }}>
-                            <span>Commission: ₹28,920</span>
-                            <span>Pending: ₹14,400</span>
+            <div className="hide-scroll" style={{ padding: "10px 16px 110px", overflowY: "auto", overflowX: "hidden" }}>
+                <RoleHeader role="franchisee" name="Suresh Iyer" title="Chennai Franchise · FR-TN-0024">
+                    {/* Revenue card with violet glow */}
+                    <div style={{ marginTop: px(12), borderRadius: px(14), border: `1px solid rgba(167,139,250,0.25)`, background: "linear-gradient(135deg,rgba(167,139,250,0.08),rgba(167,139,250,0.02))", padding: "14px" }}>
+                        <div style={{ fontFamily: F.mono, fontSize: px(9), color: C.textMuted, letterSpacing: "1.5px", marginBottom: px(8) }}>THIS MONTH REVENUE</div>
+                        <div style={{ fontFamily: F.serif, fontWeight: 900, fontSize: px(28), color: C.textPrimary, letterSpacing: "-0.5px" }}>
+                            <AnimatedNumber value="482000" />
                         </div>
-                        <button style={{ ...ghostCta(C.textMuted, { marginTop: px(8), height: px(36) }) }}>Download Statement →</button>
+                        <div style={{ marginTop: px(8), display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: px(8) }}>
+                            <div style={{ fontFamily: F.sans, fontSize: px(12), color: C.textSecondary }}>Commission: <span style={{ color: C.success, fontWeight: 600 }}>₹28,920</span></div>
+                            <div style={{ fontFamily: F.sans, fontSize: px(12), color: C.textSecondary }}>Pending: <span style={{ color: C.amber, fontWeight: 600 }}>₹14,400</span></div>
+                        </div>
+                        <button onClick={() => onNav("fr_finance")} style={{ marginTop: px(12), ...ghostCta(C.purple, { height: px(38), border: `1px solid rgba(167,139,250,0.3)`, fontSize: px(13) }) }}>
+                            Download Statement →
+                        </button>
                     </div>
                 </RoleHeader>
+
+                {/* KPI grid */}
                 <div style={{ marginTop: px(16), display: "grid", gridTemplateColumns: "1fr 1fr", gap: px(10) }}>
-                    {[{ label: "Total Leads", val: "186" }, { label: "Approvals", val: "64" }, { label: "Active Execs", val: "12" }, { label: "Objections", val: "8" }].map((k) => (
-                        <div key={k.label} style={{ borderRadius: px(12), border: `1px solid ${C.border}`, background: C.card1, padding: "10px 10px" }}>
-                            <div style={{ fontFamily: F.mono, fontSize: px(16), color: C.purple }}>{k.val}</div>
-                            <div style={{ fontFamily: F.sans, fontSize: px(10), color: C.textMuted }}>{k.label}</div>
+                    {[
+                        { label: "Total Leads", val: "186" },
+                        { label: "Approvals",   val: "64"  },
+                        { label: "Active Execs",val: "12"  },
+                        { label: "Objections",  val: "8"   }
+                    ].map((k) => (
+                        <div key={k.label} className="tappable" style={{ borderRadius: px(14), border: `1px solid ${C.border}`, background: C.card1, padding: "14px 14px" }}>
+                            <div style={{ fontFamily: F.mono, fontWeight: 700, fontSize: px(20), color: C.purple }}>{k.val}</div>
+                            <div style={{ fontFamily: F.sans, fontSize: px(11), color: C.textMuted, marginTop: px(4) }}>{k.label}</div>
                         </div>
                     ))}
                 </div>
-                <div style={{ marginTop: px(16) }}>
-                    <div style={{ fontFamily: F.mono, fontSize: px(9), color: C.textMuted, letterSpacing: "1.5px", marginBottom: px(8) }}>SCHEME-WISE</div>
-                    <div style={{ display: "flex", alignItems: "flex-end", gap: px(8), height: px(80) }}>
-                        {[{ label: "MUDRA Tarun", h: 70 }, { label: "PM SVANidhi", h: 45 }, { label: "CGTMSE", h: 30 }, { label: "Others", h: 15 }].map((b) => (
-                            <div key={b.label} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center" }}>
-                                <div style={{ width: "100%", height: px(b.h), borderRadius: px(6), background: b.label === "MUDRA Tarun" ? C.clay : b.label === "PM SVANidhi" ? C.teal : b.label === "CGTMSE" ? C.amber : C.card2 }} />
-                                <div style={{ fontFamily: F.sans, fontSize: px(9), color: C.textMuted, marginTop: px(4) }}>{b.label}</div>
-                            </div>
-                        ))}
+
+                {/* Scheme bar chart */}
+                <div style={{ marginTop: px(20) }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: px(12) }}>
+                        <div style={{ fontFamily: F.sans, fontWeight: 700, fontSize: px(14), color: C.textPrimary }}>Scheme Performance</div>
+                        <div style={{ fontFamily: F.mono, fontSize: px(10), color: C.textMuted }}>This Month</div>
                     </div>
+                    <div style={{ borderRadius: px(14), border: `1px solid ${C.border}`, background: C.card1, padding: "14px 14px" }}>
+                        <div style={{ display: "flex", alignItems: "flex-end", gap: px(10), height: px(90) }}>
+                            {bars.map((b, i) => (
+                                <div key={b.label} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: px(4) }}>
+                                    <div style={{ fontFamily: F.mono, fontSize: px(9), color: C.textSecondary }}>{b.val}</div>
+                                    <div style={{
+                                        width: "100%", borderRadius: px(6),
+                                        background: `linear-gradient(180deg,${b.color},${b.color}99)`,
+                                        height: px(b.h),
+                                        animation: `progressFill 0.${8 + i}s ease-out both`,
+                                        animationDelay: `${i * 0.1}s`
+                                    }} />
+                                </div>
+                            ))}
+                        </div>
+                        <div style={{ display: "flex", gap: px(10), marginTop: px(8) }}>
+                            {bars.map((b) => (
+                                <div key={b.label} style={{ flex: 1, fontFamily: F.sans, fontSize: px(9), color: C.textMuted, textAlign: "center" }}>{b.label}</div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Geo indicator */}
+                <div style={{ marginTop: px(14), borderRadius: px(12), border: `1px solid ${C.border}`, background: C.card1, padding: "10px 14px", display: "flex", alignItems: "center", gap: px(8) }}>
+                    {I.pin(C.purple, 16)}
+                    <div style={{ fontFamily: F.sans, fontSize: px(12), color: C.textSecondary }}>Active region: <span style={{ color: C.textPrimary, fontWeight: 600 }}>Tamil Nadu · Chennai</span></div>
                 </div>
             </div>
             <FRBottomNav navTab="fr_home" onNav={onNav} />
@@ -3748,71 +3907,101 @@ function FRProfile({ onNav }) {
 // =========================================================================
 
 function ADBottomNav({ navTab, onNav }) {
-    const items = [
-        { id: "ad_home", label: "Home", icon: I.home },
-        { id: "ad_users", label: "Users", icon: I.users },
-        { id: "ad_applications", label: "Applications", icon: I.list },
-        { id: "ad_schemes", label: "Schemes", icon: I.briefcase },
-        { id: "ad_settings", label: "Settings", icon: I.settings }
-    ];
-    return (
-        <div style={{ position: "absolute", bottom: 0, left: 0, width: "100%", padding: "10px 14px 18px", background: "linear-gradient(transparent,#0B0C0A 45%)" }}>
-            <div style={{ borderRadius: px(24), background: "rgba(12,15,11,.96)", border: `1px solid ${C.border}`, padding: "6px 10px", display: "flex", justifyContent: "space-between" }}>
-                {items.map((it) => {
-                    const active = navTab === it.id;
-                    return (
-                        <button key={it.id} onClick={() => onNav(it.id)} style={{ flex: 1, border: "none", background: "transparent", display: "flex", flexDirection: "column", alignItems: "center", gap: px(2), padding: "4px 0" }}>
-                            {it.icon(active ? C.blue : C.textMuted, 18)}
-                            <span style={{ fontFamily: F.sans, fontSize: px(9), color: active ? C.blue : C.textMuted }}>{it.label}</span>
-                        </button>
-                    );
-                })}
-            </div>
-        </div>
-    );
+    return <BottomNav navTab={navTab} onNav={onNav} accent={C.blue} items={[
+        { id: "ad_home",         label: "Home",    icon: I.home      },
+        { id: "ad_users",        label: "Users",   icon: I.users     },
+        { id: "ad_applications", label: "Apps",    icon: I.list      },
+        { id: "ad_schemes",      label: "Schemes", icon: I.briefcase },
+        { id: "ad_settings",     label: "Settings",icon: I.settings  }
+    ]} />;
 }
 
 function ADHome({ onNav }) {
+    const funnel = [
+        { label: "Total Leads",    n: 486, pct: 100, color: C.blue },
+        { label: "Docs Verified",  n: 312, pct: 64,  color: C.blue + "CC" },
+        { label: "Sent to Bank",   n: 198, pct: 41,  color: C.blue + "99" },
+        { label: "Approved",       n: 142, pct: 29,  color: C.success },
+        { label: "Disbursed",      n: 118, pct: 24,  color: C.success },
+    ];
+    const health = [
+        { label: "API", status: "Operational" },
+        { label: "Payments", status: "Active" },
+        { label: "ML Engine", status: "Operational" },
+    ];
     return (
         <div className="sc" style={{ background: C.bg, position: "relative" }}>
             <SB />
-            <div className="hide-scroll" style={{ padding: "10px 16px 90px", overflowY: "auto" }}>
-                <RoleHeader role="admin" name="Admin Panel — Loan Doctor" title={new Date().toLocaleDateString()}>
-                    <div style={{ marginTop: px(12), display: "flex", overflowX: "auto", gap: px(8) }}>
-                        {[{ label: "Total Users", val: "2,841" }, { label: "Active Apps", val: "486" }, { label: "Approved", val: "142" }, { label: "Disbursed", val: "₹47Cr+" }, { label: "Objections", val: "23" }].map((k) => (
-                            <div key={k.label} style={{ minWidth: px(88), borderRadius: px(12), border: `1px solid ${C.border}`, background: C.card1, padding: "8px 10px" }}>
-                                <div style={{ fontFamily: F.mono, fontSize: px(13), color: C.blue }}>{k.val}</div>
-                                <div style={{ fontFamily: F.sans, fontSize: px(9), color: C.textMuted }}>{k.label}</div>
+            <div className="hide-scroll" style={{ padding: "10px 16px 110px", overflowY: "auto", overflowX: "hidden" }}>
+                <RoleHeader role="admin" name="Command Center" title="Loan Doctor Platform">
+                    {/* KPI strip */}
+                    <div style={{ marginTop: px(12), display: "flex", overflowX: "auto", gap: px(8), paddingRight: px(4) }}>
+                        {[
+                            { label: "Total Users", val: "2,841" },
+                            { label: "Active Apps", val: "486"   },
+                            { label: "Approved",    val: "142"   },
+                            { label: "Disbursed",   val: "₹47Cr" },
+                            { label: "Objections",  val: "23"    }
+                        ].map((k) => (
+                            <div key={k.label} className="tappable" style={{ minWidth: px(90), flexShrink: 0, borderRadius: px(12), border: `1px solid ${C.border}`, background: C.card1, padding: "10px 10px" }}>
+                                <div style={{ fontFamily: F.mono, fontWeight: 700, fontSize: px(14), color: C.blue }}>{k.val}</div>
+                                <div style={{ fontFamily: F.sans, fontSize: px(10), color: C.textMuted, whiteSpace: "nowrap", marginTop: px(2) }}>{k.label}</div>
                             </div>
                         ))}
                     </div>
-                    <div style={{ marginTop: px(12), display: "flex", gap: px(12) }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: px(4) }}>
-                            <div style={{ width: px(6), height: px(6), borderRadius: "50%", background: C.teal }} />
-                            <span style={{ fontFamily: F.sans, fontSize: px(11), color: C.textPrimary }}>API: Operational</span>
-                        </div>
-                        <div style={{ display: "flex", alignItems: "center", gap: px(4) }}>
-                            <div style={{ width: px(6), height: px(6), borderRadius: "50%", background: C.teal }} />
-                            <span style={{ fontFamily: F.sans, fontSize: px(11), color: C.textPrimary }}>Payments: Active</span>
-                        </div>
+                    {/* System health pills */}
+                    <div style={{ marginTop: px(12), display: "flex", gap: px(8), flexWrap: "wrap" }}>
+                        {health.map((h) => (
+                            <div key={h.label} style={{ display: "flex", alignItems: "center", gap: px(6), background: C.successDim, border: "1px solid rgba(34,197,94,0.25)", borderRadius: px(20), padding: "4px 10px" }}>
+                                <div style={{ width: px(6), height: px(6), borderRadius: "50%", background: C.success, animation: "dotP 2s ease infinite" }} />
+                                <span style={{ fontFamily: F.mono, fontSize: px(10), color: C.success }}>{h.label}: {h.status}</span>
+                            </div>
+                        ))}
                     </div>
                 </RoleHeader>
-                <div style={{ marginTop: px(16) }}>
-                    <div style={{ fontFamily: F.mono, fontSize: px(9), color: C.textMuted, letterSpacing: "1.5px", marginBottom: px(6) }}>APPLICATIONS FUNNEL</div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: px(6) }}>
-                        {["Leads: 486", "Docs Verified: 312", "Sent to Bank: 198", "Approved: 142", "Disbursed: 118"].map((row) => (
-                            <div key={row} style={{ fontFamily: F.sans, fontSize: px(12), color: C.textPrimary }}>{row}</div>
+
+                {/* Funnel visualization */}
+                <div style={{ marginTop: px(18) }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: px(12) }}>
+                        <div style={{ fontFamily: F.sans, fontWeight: 700, fontSize: px(14), color: C.textPrimary }}>Applications Funnel</div>
+                        <div style={{ fontFamily: F.mono, fontSize: px(10), color: C.textMuted }}>Live</div>
+                    </div>
+                    <div style={{ borderRadius: px(14), border: `1px solid ${C.border}`, background: C.card1, padding: "14px", display: "flex", flexDirection: "column", gap: px(8) }}>
+                        {funnel.map((f) => (
+                            <div key={f.label}>
+                                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: px(4) }}>
+                                    <div style={{ fontFamily: F.sans, fontSize: px(12), color: C.textSecondary }}>{f.label}</div>
+                                    <div style={{ fontFamily: F.mono, fontSize: px(12), color: f.color, fontWeight: 700 }}>{f.n}</div>
+                                </div>
+                                <div style={{ height: px(6), background: C.card2, borderRadius: px(3) }}>
+                                    <div style={{ width: `${f.pct}%`, height: "100%", background: f.color, borderRadius: px(3), animation: "progressFill 0.8s ease-out both" }} />
+                                </div>
+                            </div>
                         ))}
                     </div>
                 </div>
-                <div style={{ marginTop: px(16), borderRadius: px(12), border: `1px solid rgba(224,82,82,.5)`, background: "rgba(224,82,82,.08)", padding: "10px 12px" }}>
-                    <div style={{ fontFamily: F.sans, fontSize: px(12), color: C.textPrimary }}>Objection Queue: 23 pending</div>
-                    <button style={{ ...ghostCta(C.textMuted, { marginTop: px(8), height: px(32), width: "auto" }) }}>View All 23 →</button>
+
+                {/* Objection queue */}
+                <div style={{ marginTop: px(16), borderRadius: px(14), border: `1px solid rgba(239,68,68,0.25)`, background: C.dangerDim, padding: "14px" }}>
+                    <div style={{ fontFamily: F.mono, fontSize: px(9), color: C.danger, letterSpacing: "1px", marginBottom: px(6) }}>ACTION REQUIRED</div>
+                    <div style={{ fontFamily: F.sans, fontWeight: 600, fontSize: px(14), color: C.textPrimary }}>23 Objections Pending</div>
+                    <div style={{ fontFamily: F.sans, fontSize: px(12), color: C.textSecondary, marginTop: px(4) }}>Banks have raised objections on these applications</div>
+                    <button onClick={() => onNav("ad_applications")} style={{ marginTop: px(12), ...cta(C.danger, { height: px(38), fontSize: px(12) }) }}>Review Objections →</button>
                 </div>
-                <div style={{ marginTop: px(16) }}>
-                    <div style={{ fontFamily: F.mono, fontSize: px(9), color: C.textMuted, letterSpacing: "1.5px", marginBottom: px(6) }}>RECENT ACTIVITY</div>
-                    {["New franchisee onboarded — Chennai (FR-TN-0024)", "₹8L disbursed — MUDRA Tarun — Ravi Kumar", "Objection raised — CGTMSE — Arjun's lead"].map((t) => (
-                        <div key={t} style={{ borderRadius: px(10), border: `1px solid ${C.border}`, background: C.card1, padding: "8px 10px", marginBottom: px(6), fontFamily: F.sans, fontSize: px(11), color: C.textPrimary }}>{t}</div>
+
+                {/* Recent activity */}
+                <div style={{ marginTop: px(18), marginBottom: px(24) }}>
+                    <div style={{ fontFamily: F.sans, fontWeight: 700, fontSize: px(14), color: C.textPrimary, marginBottom: px(10) }}>Recent Activity</div>
+                    {[
+                        { icon: C.success, text: "New franchisee onboarded — Chennai (FR-TN-0024)", time: "2h ago" },
+                        { icon: C.blue,    text: "₹8L disbursed — MUDRA Tarun — Ravi Kumar", time: "4h ago" },
+                        { icon: C.danger,  text: "Objection raised — CGTMSE — Arjun's lead", time: "5h ago" },
+                    ].map((a, i) => (
+                        <div key={i} style={{ borderRadius: px(12), border: `1px solid ${C.border}`, background: C.card1, padding: "10px 14px", marginBottom: px(8), display: "flex", alignItems: "center", gap: px(10) }}>
+                            <div style={{ width: px(8), height: px(8), borderRadius: "50%", background: a.icon, flexShrink: 0 }} />
+                            <div style={{ flex: 1, fontFamily: F.sans, fontSize: px(12), color: C.textSecondary }}>{a.text}</div>
+                            <div style={{ fontFamily: F.mono, fontSize: px(10), color: C.textMuted, flexShrink: 0 }}>{a.time}</div>
+                        </div>
                     ))}
                 </div>
             </div>
